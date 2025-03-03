@@ -1,0 +1,20 @@
+group = 'com.idolu-product'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.projectreactor:reactor-test'
+
+    // r2dbc
+    runtimeOnly 'io.asyncer:r2dbc-mysql'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

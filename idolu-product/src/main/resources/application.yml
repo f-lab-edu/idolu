@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local # 기본적으로 활성화할 profile을 local로 설정
+    active: local # ????? ???? profile? local? ??
 ---
 server:
   port: 10010
@@ -8,9 +8,8 @@ spring:
   config:
     activate:
       on-profile: local
-    import: "optional:file:.env[.properties]" # root 폴더에 .env 파일 있는 경우 해당 환경변수 사용 가능
+    import: "optional:file:.env[.properties]" # root ??? .env ?? ?? ?? ?? ???? ?? ??
   r2dbc:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_ROOT_PASSWORD}
-

@@ -1,13 +1,13 @@
-package com.oneny.idoluproduct;
+package com.idolu.product;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class IdoluProductApplicationTests {
+class ProductApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
