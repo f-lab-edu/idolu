@@ -1,1 +1,2 @@
-rootProject.name = 'idolu-product'
+rootProject.name = 'idolu'
+include("idolu-product")
