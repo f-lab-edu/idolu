@@ -1,4 +1,5 @@
 CREATE TABLE `product`
+CREATE TABLE `product`
 (
     `product_id`  bigint PRIMARY KEY AUTO_INCREMENT,
     `stock`       integer,
