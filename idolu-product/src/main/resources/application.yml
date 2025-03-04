@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local # ????? ???? profile? local? ??
+    active: local
 ---
 server:
   port: 10010
@@ -8,7 +8,6 @@ spring:
   config:
     activate:
       on-profile: local
-    import: "optional:file:.env[.properties]" # root ??? .env ?? ?? ?? ?? ???? ?? ??
   r2dbc:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
