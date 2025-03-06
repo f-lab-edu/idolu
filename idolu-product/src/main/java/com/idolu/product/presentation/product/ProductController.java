@@ -4,6 +4,7 @@ import com.idolu.product.application.product.ProductService;
 import com.idolu.product.global.common.ApiResponse;
 import com.idolu.product.presentation.product.request.ProductCreateRequest;
 import com.idolu.product.presentation.product.response.ProductCreateResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ProductController {
 
     @PostMapping("/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ApiResponse<ProductCreateResponse>> createProduct(@RequestBody ProductCreateRequest request) {
+    public Mono<ApiResponse<ProductCreateResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         return productService.createProduct(request)
                 .map(id -> ApiResponse.of(HttpStatus.CREATED, ProductCreateResponse.from(id)));
     }

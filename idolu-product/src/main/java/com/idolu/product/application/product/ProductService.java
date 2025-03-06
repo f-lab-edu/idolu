@@ -1,6 +1,5 @@
 package com.idolu.product.application.product;
 
-import com.idolu.product.domain.product.ProductStatus;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
 import com.idolu.product.presentation.product.request.ProductCreateRequest;
 import lombok.RequiredArgsConstructor;
