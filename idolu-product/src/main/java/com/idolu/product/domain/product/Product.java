@@ -10,7 +10,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 
 @Getter
+@Builder
 @Table("product")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class Product extends BaseEntity {
@@ -34,15 +36,4 @@ public class Product extends BaseEntity {
 
     @Version
     private Integer version;
-
-    @Builder
-    public Product(Integer stock, String name, String imageUrl, String description, BigDecimal price, ProductStatus status) {
-        this.stock = stock;
-        this.name = name;
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.price = price;
-        this.status = status;
-        this.isDeleted = false;
-    }
 }

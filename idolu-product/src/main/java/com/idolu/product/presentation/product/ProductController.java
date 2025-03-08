@@ -20,7 +20,7 @@ public class ProductController {
     @PostMapping("/products")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ApiResponse<ProductCreateResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
-        return productService.createProduct(request)
+        return productService.createProduct(request.toCommand())
                 .map(id -> ApiResponse.of(HttpStatus.CREATED, ProductCreateResponse.from(id)));
     }
 }
