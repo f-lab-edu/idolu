@@ -17,6 +17,7 @@ CREATE TABLE `category`
 (
     `category_id`   bigint PRIMARY KEY AUTO_INCREMENT,
     `category_code` varchar(255),
+    `category_name` varchar(255),
     `is_deleted`    boolean,
     `created_at`    datetime,
     `updated_at`    datetime
