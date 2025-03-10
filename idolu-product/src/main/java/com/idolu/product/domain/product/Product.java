@@ -5,6 +5,7 @@ import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 public class Product extends BaseEntity {
 
     @Id
+    @Column("product_id")
     private Long id;
 
     private Integer stock;
