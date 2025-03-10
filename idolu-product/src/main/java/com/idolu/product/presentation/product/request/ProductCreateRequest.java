@@ -4,6 +4,7 @@ import com.idolu.product.application.command.ProductCreateCommand;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 public class ProductCreateRequest {
@@ -20,6 +21,8 @@ public class ProductCreateRequest {
 
     private String status;
 
+    private List<String> categories;
+
     public ProductCreateCommand toCommand() {
         return ProductCreateCommand.builder()
                 .name(this.name)
@@ -28,6 +31,7 @@ public class ProductCreateRequest {
                 .description(this.description)
                 .price(this.price)
                 .status(this.status)
+                .categories(categories)
                 .build();
     }
 }
