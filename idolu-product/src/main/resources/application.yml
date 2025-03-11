@@ -12,3 +12,8 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_ROOT_PASSWORD}
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
