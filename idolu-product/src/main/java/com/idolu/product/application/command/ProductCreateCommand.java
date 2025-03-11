@@ -1,5 +1,6 @@
 package com.idolu.product.application.command;
 
+import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductStatus;
 import com.idolu.product.global.common.SelfValidating;
@@ -54,7 +55,8 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
         this.validateSelf();
     }
 
-    public Product toEntity() {
+    public Product toEntity(List<Category> categories) {
+
         return Product.builder()
                 .name(this.name)
                 .stock(this.stock)
@@ -63,6 +65,7 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
                 .price(this.price)
                 .status(this.status)
                 .isDeleted(this.isDeleted)
+                .categories(categories)
                 .build();
     }
 }

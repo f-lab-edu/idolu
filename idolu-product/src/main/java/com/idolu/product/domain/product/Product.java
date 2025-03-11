@@ -1,17 +1,21 @@
 package com.idolu.product.domain.product;
 
 
+import com.idolu.product.domain.category.Category;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Builder
+@ToString
 @Table("product")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,4 +42,7 @@ public class Product extends BaseEntity {
 
     @Version
     private Integer version;
+
+    @Transient
+    private List<Category> categories;
 }
