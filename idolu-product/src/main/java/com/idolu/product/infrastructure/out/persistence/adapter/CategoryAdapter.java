@@ -20,8 +20,15 @@ public class CategoryAdapter {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Flux<Category> validateCategoriesExist(List<String> categoryCodes) {
+    public Mono<List<Category>> validateCategoriesExist(List<String> categoryCodes) {
         return categoryRepository.findByCategoryCodeIn(categoryCodes)
-                .switchIfEmpty(Mono.error(new ProductCreateValidationException(PRODUCT_CATEGORIES_VALIDATION_FAILED)));
+                .collectList()
+                .flatMap(categories -> {
+                    if (categories.size() != categoryCodes.size()) {
+                        return Mono.error(new ProductCreateValidationException(PRODUCT_CATEGORIES_VALIDATION_FAILED));
+                    }
+
+                    return Mono.just(categories);
+                });
     }
 }

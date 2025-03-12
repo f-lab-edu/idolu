@@ -18,7 +18,6 @@ public class ProductService {
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.validateCategoriesExist(command.getCategories())
-                .collectList()
                 .flatMap((categories) -> productAdapter.createProduct(command.toEntity(categories)));
     }
 }
