@@ -1,0 +1,25 @@
+package com.idolu.product.domain.product;
+
+import com.idolu.product.global.exception.ProductCreateValidationException;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+
+import static com.idolu.product.global.exception.ErrorCode.PRODUCT_STATUS_VALIDATION_FAILED;
+
+public enum ProductStatus {
+    COMING_SOON,
+    ON_SALE,
+    SOLD_OUT,
+    TERMINATED
+    ;
+
+    private static final EnumSet<ProductStatus> VALID_INITIAL_STATES = EnumSet.of(COMING_SOON, ON_SALE);
+
+    public static ProductStatus validateInitialState(String status) {
+        return Arrays.stream(ProductStatus.values())
+                .filter(productStatus -> VALID_INITIAL_STATES.contains(productStatus) && productStatus.name().equals(status))
+                .findAny()
+                .orElseThrow(() -> new ProductCreateValidationException(PRODUCT_STATUS_VALIDATION_FAILED));
+    }
+}
