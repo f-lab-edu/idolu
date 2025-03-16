@@ -26,14 +26,14 @@ public class ProductCategory extends BaseEntity {
 
     private Long categoryId;
 
-    private Boolean isDeleted;
+    private Boolean deleted;
 
     public static List<ProductCategory> from(Product product) {
         return product.getCategories().stream()
                 .map(category -> ProductCategory.builder()
-                        .productId(product.getId())
+                        .productId(product.getProductId())
                         .categoryId(category.getId())
-                        .isDeleted(category.getIsDeleted() != null && category.getIsDeleted())
+                        .deleted(category.getDeleted() != null && category.getDeleted())
                         .build())
                 .collect(Collectors.toList());
     }

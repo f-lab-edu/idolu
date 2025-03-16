@@ -22,5 +22,5 @@ public class Category extends BaseEntity {
 
     private String categoryName;
 
-    private Boolean isDeleted;
+    private Boolean deleted;
 }

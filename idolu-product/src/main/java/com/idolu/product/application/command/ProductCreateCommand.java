@@ -38,7 +38,7 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
 
     private List<String> categories;
 
-    private Boolean isDeleted;
+    private Boolean deleted;
 
     private ProductStatus status;
 
@@ -50,7 +50,7 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
         this.description = description;
         this.price = price;
         this.categories = categories;
-        this.isDeleted = false;
+        this.deleted = false;
         this.status = validateInitialState(status);
         this.validateSelf();
     }
@@ -64,7 +64,7 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
                 .description(this.description)
                 .price(this.price)
                 .status(this.status)
-                .isDeleted(this.isDeleted)
+                .deleted(this.deleted)
                 .categories(categories)
                 .build();
     }
