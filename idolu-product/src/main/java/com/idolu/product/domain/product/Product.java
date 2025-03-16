@@ -19,12 +19,11 @@ import java.util.List;
 @Table("product")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "productId", callSuper = false)
 public class Product extends BaseEntity {
 
     @Id
-    @Column("product_id")
-    private Long id;
+    private Long productId;
 
     private Integer stock;
 
