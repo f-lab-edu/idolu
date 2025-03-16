@@ -52,7 +52,7 @@ public class ExceptionAdvice {
         log.warn("ProductCreateValidationException: {}", exception.getMessage());
         return Mono.just(ApiResponse.of(
             HttpStatus.BAD_REQUEST,
-            exception.getErrorCode().getMessage(),
+            null,
             DetailErrorCodeResponse.from(exception.getErrorCode().getDetailCode())
         ));
     }

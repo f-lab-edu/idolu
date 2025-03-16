@@ -1,5 +1,6 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
+import static com.idolu.product.global.exception.ErrorCode.PRODUCT_CATEGORIES_VALIDATION_FAILED;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -12,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.idolu.product.domain.category.Category;
-import com.idolu.product.global.exception.ErrorCode;
 import com.idolu.product.global.exception.ProductCreateValidationException;
 import com.idolu.product.infrastructure.out.persistence.repository.CategoryRepository;
 
@@ -56,7 +56,7 @@ class CategoryAdapterTest {
 			.verifyErrorSatisfies(e -> {
 				assertThat(e)
 					.isInstanceOf(ProductCreateValidationException.class)
-					.hasMessage(ErrorCode.PRODUCT_CATEGORIES_VALIDATION_FAILED.getMessage());
+					.hasMessage(PRODUCT_CATEGORIES_VALIDATION_FAILED.getMessage());
 			});
 	}
 }
