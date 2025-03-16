@@ -14,8 +14,7 @@ public enum ProductStatus {
 
     public static ProductStatus validateInitialState(String status) {
         return Arrays.stream(ProductStatus.values())
-                .filter(VALID_INITIAL_STATES::contains)
-                .filter(productStatus -> productStatus.name().equals(status))
+                .filter(productStatus -> VALID_INITIAL_STATES.contains(productStatus) && productStatus.name().equals(status))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("%s는 상품 초기 상태가 아닙니다.".formatted(status)));
     }
