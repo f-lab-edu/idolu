@@ -32,7 +32,7 @@ class CategoryAdapterTest {
 	void 카테고리가_모두_존재하면_카테고리_리스트를_반환한다() {
 		// given
 		List<String> categoryCodes = List.of("001", "002");
-		given(categoryRepository.findByCategoryCodeIn(categoryCodes))
+		given(categoryRepository.findByCategoryCodeInAndDeleted(categoryCodes, false))
 			.willReturn(Flux.just(Category.builder().build(), Category.builder().build()));
 
 		// when
@@ -48,7 +48,7 @@ class CategoryAdapterTest {
 	void 존재하지_않는_카테고리가_있다면_카테고리_리스트를_반환한다() {
 		// given
 		List<String> categoryCodes = List.of("001", "002");
-		given(categoryRepository.findByCategoryCodeIn(categoryCodes))
+		given(categoryRepository.findByCategoryCodeInAndDeleted(categoryCodes, false))
 			.willReturn(Flux.just(Category.builder().build()));
 
 		// when
