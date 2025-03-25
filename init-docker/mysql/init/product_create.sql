@@ -28,7 +28,6 @@ CREATE TABLE `product_category`
     `product_category_id` bigint PRIMARY KEY AUTO_INCREMENT,
     `product_id`          bigint,
     `category_id`         bigint,
-    `deleted`          boolean,
     `created_at`          datetime,
     `updated_at`          datetime
 );
