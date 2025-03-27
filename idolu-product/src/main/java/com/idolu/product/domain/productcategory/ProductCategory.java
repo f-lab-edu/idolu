@@ -3,6 +3,7 @@ package com.idolu.product.domain.productcategory;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @Table("product_category")
 @EqualsAndHashCode(of = "productCategoryId", callSuper = false)

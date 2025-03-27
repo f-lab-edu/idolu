@@ -2,11 +2,12 @@ package com.idolu.product.domain.category;
 
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
-@Builder
+@SuperBuilder
 @Table("category")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
