@@ -3,8 +3,7 @@ package com.idolu.product.application.product;
 import com.idolu.product.application.command.ProductCreateCommand;
 import com.idolu.product.application.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.global.exception.ErrorCode;
-import com.idolu.product.global.exception.ProductUpdateValidationException;
+import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
+
+import static com.idolu.product.global.exception.ErrorCode.PRODUCT_INVALID_UPDATED_TIME;
 
 @Service
 @Slf4j
@@ -41,7 +42,7 @@ public class ProductService {
         return productAdapter.findById(command.getProductId())
                 .flatMap(product -> {
                     if (!product.getUpdatedAt().isEqual(command.getUpdatedAt())) {
-                        return Mono.error(new ProductUpdateValidationException(ErrorCode.PRODUCT_INVALID_UPDATED_TIME));
+                        return Mono.error(new ProductUpdateException(PRODUCT_INVALID_UPDATED_TIME, PRODUCT_INVALID_UPDATED_TIME.getMessage().formatted(product.getProductId())));
                     }
 
                     return Mono.just(product.changeInfo(command));
