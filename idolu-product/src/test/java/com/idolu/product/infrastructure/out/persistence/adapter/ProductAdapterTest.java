@@ -32,7 +32,7 @@ class ProductAdapterTest {
                 .willReturn(Mono.just(product));
 
         // when, then
-        StepVerifier.create(productAdapter.findById(product))
+        StepVerifier.create(productAdapter.findById(product.getProductId()))
                 .expectNext(product)
                 .verifyComplete();
     }
@@ -45,7 +45,7 @@ class ProductAdapterTest {
                 .willReturn(Mono.empty());
 
         // when, then
-        StepVerifier.create(productAdapter.findById(product))
+        StepVerifier.create(productAdapter.findById(product.getProductId()))
                 .verifyErrorSatisfies(e -> {
                     assertThat(e)
                             .isInstanceOf(ProductNotFoundException.class)
