@@ -3,9 +3,6 @@ package com.idolu.product.application.command;
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductStatus;
-import com.idolu.product.global.common.SelfValidating;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,21 +16,16 @@ import static com.idolu.product.domain.product.ProductStatus.validateInitialStat
 @Getter
 @Slf4j
 @EqualsAndHashCode(callSuper = false)
-public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
+public class ProductCreateCommand {
 
-    @NotBlank(message = "상품 이름을 필수입니다.")
     private String name;
 
-    @Min(value = 1, message = "재고는 1보다 커야 합니다.")
     private Integer stock;
 
-    @NotBlank(message = "이미지 url은 필수입니다.")
     private String imageUrl;
 
-    @NotBlank(message = "상품 설명은 필수입니다.")
     private String description;
 
-    @Min(value = 1_000, message = "가격은 1000원보다 커야 합니다.")
     private BigDecimal price;
 
     private List<String> categories;
@@ -52,7 +44,6 @@ public class ProductCreateCommand extends SelfValidating<ProductCreateCommand> {
         this.categories = categories;
         this.deleted = false;
         this.status = validateInitialState(status);
-        this.validateSelf();
     }
 
     public Product toEntity(List<Category> categories) {
