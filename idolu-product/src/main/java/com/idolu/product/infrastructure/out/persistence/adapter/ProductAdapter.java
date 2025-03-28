@@ -54,26 +54,9 @@ public class ProductAdapter {
                     return e; // 다른 예외는 그대로 전달
                 })
                 .flatMapMany(updatedProduct -> productCategoryAdapter.findByProductId(updatedProduct.getProductId()))
-                .map(ProductCategory::getCategoryId)
-                .collect(Collectors.toSet())
-                .flatMap(existingProductCategoryIds -> {
-                    HashSet<Long> newProductCategoryIds = product.getCategories().stream().map(Category::getCategoryId)
-                            .collect(Collectors.toCollection(HashSet::new));
-
-                    // 추가해야 할 카테고리
-                    Flux<ProductCategory> productCategoriesToAdd = Flux.fromIterable(newProductCategoryIds)
-                            .filter(newCategoryId -> !existingProductCategoryIds.contains(newCategoryId))
-                            .map(newCategoryId -> ProductCategory.builder().categoryId(newCategoryId).productId(product.getProductId()).build());
-
-                    // 삭제해야 할 카테고리
-                    Flux<Long> productCategoriesToRemove = Flux.fromIterable(existingProductCategoryIds)
-                            .filter(existingCategoryId -> !newProductCategoryIds.contains(existingCategoryId));
-
-                    return Mono.when(
-                            productCategoriesToAdd.flatMap(productCategoryAdapter::saveProductCategory),
-                            productCategoriesToRemove.flatMap(categoryId -> productCategoryAdapter.deleteByCategoryIdAndProductId(categoryId, product.getProductId()))
-                    );
-                })
+                .flatMap(existingProductCategory -> productCategoryAdapter.deleteByCategoryIdAndProductId(existingProductCategory.getCategoryId(), existingProductCategory.getProductId())) // 기존 카테고리 삭제
+                .then(Flux.fromIterable(ProductCategory.from(product)) // 새 상품 카테고리 저장
+                        .flatMap(productCategoryAdapter::saveProductCategory).then())
                 .thenReturn(product);
     }
 }
