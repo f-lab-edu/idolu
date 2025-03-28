@@ -25,12 +25,14 @@ public class ProductCategory extends BaseEntity {
 
     private Long categoryId;
 
+    private Boolean deleted;
 
     public static List<ProductCategory> from(Product product) {
         return product.getCategories().stream()
                 .map(category -> ProductCategory.builder()
                         .productId(product.getProductId())
                         .categoryId(category.getCategoryId())
+                        .deleted(false)
                         .build())
                 .collect(Collectors.toList());
     }

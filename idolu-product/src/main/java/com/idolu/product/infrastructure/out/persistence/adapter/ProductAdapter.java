@@ -1,6 +1,5 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
-import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.global.exception.ProductNotFoundException;
@@ -13,9 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import static com.idolu.product.global.exception.ErrorCode.*;
 
@@ -54,7 +50,7 @@ public class ProductAdapter {
                     return e; // 다른 예외는 그대로 전달
                 })
                 .flatMapMany(updatedProduct -> productCategoryAdapter.findByProductId(updatedProduct.getProductId()))
-                .flatMap(existingProductCategory -> productCategoryAdapter.deleteByCategoryIdAndProductId(existingProductCategory.getCategoryId(), existingProductCategory.getProductId())) // 기존 카테고리 삭제
+                .flatMap(existingProductCategory -> productCategoryAdapter.setDeletedByCategoryIdAndProductId(existingProductCategory.getCategoryId(), existingProductCategory.getProductId())) // 기존 카테고리 삭제
                 .then(Flux.fromIterable(ProductCategory.from(product)) // 새 상품 카테고리 저장
                         .flatMap(productCategoryAdapter::saveProductCategory).then())
                 .thenReturn(product);

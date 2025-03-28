@@ -20,10 +20,10 @@ public class ProductCategoryAdapter {
     }
 
     public Flux<ProductCategory> findByProductId(Long productId) {
-        return productCategoryRepository.findByProductId(productId);
+        return productCategoryRepository.findByProductIdAndDeleted(productId, false);
     }
 
-    public Mono<Void> deleteByCategoryIdAndProductId(Long categoryId, Long productId) {
-        return productCategoryRepository.deleteByCategoryIdAndProductId(categoryId, productId);
+    public Mono<Void> setDeletedByCategoryIdAndProductId(Long categoryId, Long productId) {
+        return productCategoryRepository.setDeletedByCategoryIdAndProductId(categoryId, productId);
     }
 }
