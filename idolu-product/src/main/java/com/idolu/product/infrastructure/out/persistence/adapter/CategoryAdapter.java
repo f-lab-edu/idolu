@@ -20,7 +20,7 @@ public class CategoryAdapter {
 
     @Transactional(readOnly = true)
     public Mono<List<Category>> validateCategoriesExist(List<String> categoryCodes) {
-        return categoryRepository.findByCategoryCodeIn(categoryCodes)
+        return categoryRepository.findByCategoryCodeInAndDeleted(categoryCodes, false)
                 .collectList()
                 .flatMap(categories -> {
                     if (categories.size() != categoryCodes.size()) {

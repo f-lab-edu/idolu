@@ -4,7 +4,7 @@ import com.idolu.product.global.common.ApiResponse;
 import com.idolu.product.global.common.DetailErrorCodeResponse;
 import com.idolu.product.global.exception.ProductCreateValidationException;
 
-import jakarta.validation.ConstraintViolationException;
+import com.idolu.product.global.exception.ProductUpdateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,25 +35,25 @@ public class ExceptionAdvice {
         ));
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected Mono<ApiResponse<String>> constraintViolationException(ConstraintViolationException exception) {
-        log.warn("ConstraintViolationException: {}", exception.getMessage());
-        return Mono.just(ApiResponse.of(
-                HttpStatus.BAD_REQUEST,
-                exception.getConstraintViolations().iterator().next().getMessage(),
-                null
-        ));
-    }
-
     @ExceptionHandler(ProductCreateValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Mono<ApiResponse<DetailErrorCodeResponse>> productCreateValidationException(ProductCreateValidationException exception) {
         log.warn("ProductCreateValidationException: {}", exception.getMessage());
         return Mono.just(ApiResponse.of(
-            HttpStatus.BAD_REQUEST,
+            exception.getErrorCode().getStatus(),
             null,
             DetailErrorCodeResponse.from(exception.getErrorCode().getDetailCode())
+        ));
+    }
+
+    @ExceptionHandler(ProductUpdateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Mono<ApiResponse<DetailErrorCodeResponse>> productUpdateException(ProductUpdateException exception) {
+        log.warn("ProductUpdateException: {}", exception.getMessage());
+        return Mono.just(ApiResponse.of(
+                exception.getErrorCode().getStatus(),
+                null,
+                DetailErrorCodeResponse.from(exception.getErrorCode().getDetailCode())
         ));
     }
 }

@@ -5,6 +5,7 @@ import com.idolu.product.infrastructure.out.persistence.repository.ProductCatego
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -16,5 +17,13 @@ public class ProductCategoryAdapter {
     @Transactional
     public Mono<ProductCategory> saveProductCategory(ProductCategory productCategory) {
         return productCategoryRepository.save(productCategory);
+    }
+
+    public Flux<ProductCategory> findByProductId(Long productId) {
+        return productCategoryRepository.findByProductIdAndDeleted(productId, false);
+    }
+
+    public Mono<Void> setDeletedByCategoryIdAndProductId(Long categoryId, Long productId) {
+        return productCategoryRepository.setDeletedByCategoryIdAndProductId(categoryId, productId);
     }
 }
