@@ -24,21 +24,37 @@ import java.util.List;
 public class Product extends BaseEntity {
 
     @Id
-    private Long productId;
+    private Long productId; // 상품 id
 
-    private Integer stock;
+    private String productIdentifier; // 상품 외부 id
 
-    private String name;
+    private Long storeId; // 회원사 id
 
-    private String imageUrl;
+    private Integer stock; // 재고
 
-    private String description;
+    private String name; // 상품명
 
-    private BigDecimal price;
+    private ProductStatus status; // 상품 상태
 
-    private ProductStatus status;
+    private Boolean roundDiscountYn; // 기간별 할인 여뷰
 
-    private Boolean deleted;
+    private BigDecimal basicPrice; // 기본 가격
+
+    private BigDecimal sellingPrice; // 할인 가격
+
+    private Integer discountRate; // 할인율
+
+    private Boolean discountOneTime; // 일회성 할인 여부
+
+    private Integer contractPeriod; // 계약 기간
+
+    private String contractPeriodUnitCode; // 계약 기간 단위
+
+    private Integer servicePeriod; // 서비스 제공주기
+
+    private String servicePeriodUnitCOde; // 서비스 제공주기 단위
+
+    private Boolean deleted; // 삭제 여부
 
     @Version
     private Integer version;
@@ -56,9 +72,7 @@ public class Product extends BaseEntity {
                 .productId(this.productId)
                 .stock(command.getStock())
                 .name(command.getName())
-                .imageUrl(command.getImageUrl())
-                .description(command.getDescription())
-                .price(command.getPrice())
+                .basicPrice(command.getPrice())
                 .status(command.getStatus())
                 .deleted(command.getDeleted())
                 .version(this.version)
