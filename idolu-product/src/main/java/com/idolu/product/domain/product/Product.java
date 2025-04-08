@@ -3,6 +3,7 @@ package com.idolu.product.domain.product;
 
 import com.idolu.product.application.command.ProductUpdateCommand;
 import com.idolu.product.domain.category.Category;
+import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
@@ -49,11 +50,11 @@ public class Product extends BaseEntity {
 
     private Integer contractPeriod; // 계약 기간
 
-    private String contractPeriodUnitCode; // 계약 기간 단위
+    private PeriodUnitCode contractPeriodUnitCode; // 계약 기간 단위
 
     private Integer servicePeriod; // 서비스 제공주기
 
-    private String servicePeriodUnitCode; // 서비스 제공주기 단위
+    private PeriodUnitCode servicePeriodUnitCode; // 서비스 제공주기 단위
 
     private Boolean deleted; // 삭제 여부
 

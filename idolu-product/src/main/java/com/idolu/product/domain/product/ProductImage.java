@@ -19,13 +19,13 @@ public class ProductImage extends BaseEntity {
     @Id
     private Long productImageId;
 
-    private Long productId;
+    private Long productId; // 상품 id
 
-    private String imageType;
+    private String imageType; // 이미지 유형
 
     private String url;
 
-    private Integer sortNumber;
+    private Integer sortNumber; // 정렬 순서
 
     private Boolean deleted = false;
 }
