@@ -1,10 +1,7 @@
 package com.idolu.product.domain.product;
 
 import com.idolu.product.global.common.BaseEntity;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -27,5 +24,6 @@ public class ProductImage extends BaseEntity {
 
     private Integer sortNumber; // 정렬 순서
 
+    @Builder.Default
     private Boolean deleted = false;
 }

@@ -23,9 +23,12 @@ public class ProductDiscount extends BaseEntity {
 
     private Long productId; // 상품 id
 
+    private Integer discountRound; // 적용 회차
+
     private BigDecimal discountValue; // 할인 금액/할인율
 
     private DiscountCode discountCode; // 할인 유형
 
+    @Builder.Default
     private Boolean deleted = false;
 }

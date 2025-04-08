@@ -56,13 +56,23 @@ public class Product extends BaseEntity {
 
     private PeriodUnitCode servicePeriodUnitCode; // 서비스 제공주기 단위
 
-    private Boolean deleted; // 삭제 여부
+    @Builder.Default
+    private Boolean deleted = false; // 삭제 여부
 
     @Version
     private Integer version;
 
     @Transient
     private List<Category> categories;
+
+    @Transient
+    private List<ProductDiscount> productDiscounts;
+
+    @Transient
+    private List<ProductDescription> productDescriptions;
+
+    @Transient
+    private List<ProductImage> productImages;
 
     public Product withCategories(List<Category> categories) {
         this.categories = categories;

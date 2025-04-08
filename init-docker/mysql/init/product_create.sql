@@ -91,17 +91,3 @@ CREATE TABLE `inventory_update_event` (
     `event_status` varchar(30) COMMENT '이벤트 상태',
     `created_at` datetime COMMENT '생성 일시'
 );
-
-ALTER TABLE `product_category` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `product_image` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `product_description` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `product_discount` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `product_category` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`);
-
-ALTER TABLE `inventory_update_event` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
-
-ALTER TABLE `product` ADD FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`);
