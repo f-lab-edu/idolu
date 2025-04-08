@@ -1,12 +1,12 @@
 CREATE TABLE `product` (
     `product_id` bigint PRIMARY KEY COMMENT '상품 id',
-    `product_identifier` varchar(50) UNIQUE COMMENT '외부 상품 id',
+    `product_identifier` varchar(50) UNIQUE COMMENT '상품 외부 id',
     `store_id` varchar(30) UNIQUE COMMENT '회원사 id',
     `stock` integer COMMENT '재고',
     `name` varchar(200) COMMENT '상품명',
     `product_status` varchar(50) COMMENT '상품 상태',
     `version` bigint,
-    `round_discount_yn` boolean DEFAULT false COMMENT '기간별 할인 여부',
+    `apply_rount_discount` boolean DEFAULT false COMMENT '기간별 할인 여부',
     `basic_price` decimal(7,4) COMMENT '기본 가격',
     `selling_price` decimal(7,4) COMMENT '할인 가격',
     `discount_rate` int COMMENT '할인율',
@@ -21,12 +21,10 @@ CREATE TABLE `product` (
 );
 
 CREATE TABLE `product_discount` (
-    `product_item_discount_id` bigint PRIMARY KEY COMMENT '연관상품 할인 id',
+    `product_discount_id` bigint PRIMARY KEY COMMENT '연관상품 할인 id',
     `product_id` bigint COMMENT '연관상품 id',
     `discount_round` int COMMENT '적용 회차',
-    `before_discount_price` decimal(7,4) COMMENT '할인 전 가격',
-    `after_discount_price` decimal(7,4) COMMENT '할인 후 가격',
-    `discount_rate` decimal(7,4) COMMENT '할인율',
+    `discount_value` decimal(7,4) COMMENT '할인 금액/할인율',
     `discount_code` varchar(30) COMMENT '할인 유형',
     `deleted` boolean DEFAULT false COMMENT '삭제 여부',
     `created_at` datetime COMMENT '생성 일시',
@@ -34,7 +32,7 @@ CREATE TABLE `product_discount` (
 );
 
 CREATE TABLE `product_image` (
-    `id` bigint PRIMARY KEY COMMENT '상품 이미지 id',
+    `product_image_id` bigint PRIMARY KEY COMMENT '상품 이미지 id',
     `product_id` bigint COMMENT '상품 id',
     `image_type` varchar(30) COMMENT '이미지 유형',
     `url` text COMMENT '파일 url',
@@ -44,8 +42,8 @@ CREATE TABLE `product_image` (
     `updated_at` datetime COMMENT '최종 수정 일시'
 );
 
-CREATE TABLE `produc_description` (
-    `id` bigint PRIMARY KEY COMMENT '연관상품 설명 id',
+CREATE TABLE `product_description` (
+    `product_description_id` bigint PRIMARY KEY COMMENT '연관상품 설명 id',
     `product_id` bigint COMMENT '상품 id',
     `title` varchar(200) COMMENT '항목',
     `content` varchar(200) COMMENT '내용',
@@ -87,9 +85,23 @@ CREATE TABLE `store` (
 
 CREATE TABLE `inventory_update_event` (
     `inventory_update_event_id` bigint PRIMARY KEY COMMENT '재고 요청 관리 id',
-    `product_id` bigint COMMENT '상품 id',
-    `order_id` bigint COMMENT '주문 id',
+    `product_identifier` varchar(50) COMMENT '상품 외부 id',
+    `order_number` varchar(50) COMMENT '주문 외부 id',
     `event_type` varchar(30) COMMENT '이벤트 타입',
     `event_status` varchar(30) COMMENT '이벤트 상태',
     `created_at` datetime COMMENT '생성 일시'
 );
+
+ALTER TABLE `product_category` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_image` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_description` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_discount` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product_category` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`);
+
+ALTER TABLE `inventory_update_event` ADD FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
+
+ALTER TABLE `product` ADD FOREIGN KEY (`store_id`) REFERENCES `store` (`store_id`);

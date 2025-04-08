@@ -1,9 +1,7 @@
 package com.idolu.product.application.product;
 
 import com.idolu.product.application.command.ProductUpdateCommand;
-import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.domain.product.ProductStatus;
 import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
@@ -16,7 +14,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.idolu.product.global.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;

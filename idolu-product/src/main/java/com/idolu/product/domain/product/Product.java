@@ -3,6 +3,7 @@ package com.idolu.product.domain.product;
 
 import com.idolu.product.application.command.ProductUpdateCommand;
 import com.idolu.product.domain.category.Category;
+import com.idolu.product.domain.product.type.ProductStatus;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -36,7 +37,7 @@ public class Product extends BaseEntity {
 
     private ProductStatus status; // 상품 상태
 
-    private Boolean roundDiscountYn; // 기간별 할인 여뷰
+    private Boolean applyRoundDiscount; // 기간별 할인 여뷰
 
     private BigDecimal basicPrice; // 기본 가격
 
@@ -52,7 +53,7 @@ public class Product extends BaseEntity {
 
     private Integer servicePeriod; // 서비스 제공주기
 
-    private String servicePeriodUnitCOde; // 서비스 제공주기 단위
+    private String servicePeriodUnitCode; // 서비스 제공주기 단위
 
     private Boolean deleted; // 삭제 여부
 

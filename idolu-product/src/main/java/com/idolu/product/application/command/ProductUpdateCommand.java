@@ -1,6 +1,6 @@
 package com.idolu.product.application.command;
 
-import com.idolu.product.domain.product.ProductStatus;
+import com.idolu.product.domain.product.type.ProductStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.idolu.product.domain.product.ProductStatus.toProductStatus;
+import static com.idolu.product.domain.product.type.ProductStatus.toProductStatus;
 
 @Getter
 public class ProductUpdateCommand {

@@ -2,7 +2,7 @@ package com.idolu.product.application.command;
 
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.domain.product.ProductStatus;
+import com.idolu.product.domain.product.type.ProductStatus;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.idolu.product.domain.product.ProductStatus.validateInitialState;
+import static com.idolu.product.domain.product.type.ProductStatus.validateInitialState;
 
 @Getter
 @Slf4j
