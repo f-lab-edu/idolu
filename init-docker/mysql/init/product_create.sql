@@ -15,6 +15,7 @@ CREATE TABLE `product` (
     `contract_period_unit_code` varchar(30) COMMENT '계약 기간 단위',
     `service_period` int COMMENT '서비스 제공주기',
     `service_period_unit_code` varchar(30) COMMENT '서비스 제공주기 단위',
+    `product_information` json COMMENT '상품 정보',
     `deleted` boolean DEFAULT false COMMENT '삭제 여부',
     `created_at` datetime COMMENT '생성 일시',
     `updated_at` datetime COMMENT '최종 수정 일시'
@@ -37,17 +38,6 @@ CREATE TABLE `product_image` (
     `image_type` varchar(30) COMMENT '이미지 유형',
     `url` text COMMENT '파일 url',
     `sort_number` int COMMENT '정렬 순서',
-    `deleted` boolean DEFAULT false COMMENT '삭제 여부',
-    `created_at` datetime COMMENT '생성 일시',
-    `updated_at` datetime COMMENT '최종 수정 일시'
-);
-
-CREATE TABLE `product_description` (
-    `product_description_id` bigint PRIMARY KEY COMMENT '연관상품 설명 id',
-    `product_id` bigint COMMENT '상품 id',
-    `title` varchar(200) COMMENT '항목',
-    `content` varchar(200) COMMENT '내용',
-    `sortNumber` int COMMENT '정렬 순서',
     `deleted` boolean DEFAULT false COMMENT '삭제 여부',
     `created_at` datetime COMMENT '생성 일시',
     `updated_at` datetime COMMENT '최종 수정 일시'

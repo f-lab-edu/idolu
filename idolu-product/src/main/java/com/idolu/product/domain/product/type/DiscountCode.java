@@ -10,7 +10,7 @@ public enum DiscountCode {
     AMOUNT,
     RATE;
 
-    public DiscountCode toDiscountCode(String code) {
+    public static DiscountCode toDiscountCode(String code) {
         return Arrays.stream(DiscountCode.values())
                 .filter(discountCode -> discountCode.name().equals(code))
                 .findAny()

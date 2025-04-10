@@ -1,7 +1,7 @@
 package com.idolu.product.domain.product;
 
 
-import com.idolu.product.application.command.ProductUpdateCommand;
+import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
@@ -56,6 +56,8 @@ public class Product extends BaseEntity {
 
     private PeriodUnitCode servicePeriodUnitCode; // 서비스 제공주기 단위
 
+    private String productInformation; // 상품 정보
+
     @Builder.Default
     private Boolean deleted = false; // 삭제 여부
 
@@ -67,9 +69,6 @@ public class Product extends BaseEntity {
 
     @Transient
     private List<ProductDiscount> productDiscounts;
-
-    @Transient
-    private List<ProductDescription> productDescriptions;
 
     @Transient
     private List<ProductImage> productImages;

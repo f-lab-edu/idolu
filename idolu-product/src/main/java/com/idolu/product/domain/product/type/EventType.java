@@ -9,7 +9,7 @@ import static com.idolu.product.global.exception.ErrorCode.ENUM_VALIDATE_FAILED;
 public enum EventType {
     INVENTORY_INCREASE, INVENTORY_DECREASE;
 
-    public EventType toEventType(String type) {
+    public static EventType toEventType(String type) {
         return Arrays.stream(EventType.values())
                 .filter(eventType -> eventType.name().equals(type))
                 .findAny()

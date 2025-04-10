@@ -12,7 +12,7 @@ public enum PeriodUnitCode {
     WEEK,
     DAY;
 
-    public PeriodUnitCode toPeriodUnitCode(String code) {
+    public static PeriodUnitCode toPeriodUnitCode(String code) {
         return Arrays.stream(PeriodUnitCode.values())
                 .filter(periodUnitCode -> periodUnitCode.name().equals(code))
                 .findAny()
