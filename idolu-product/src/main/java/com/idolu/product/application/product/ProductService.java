@@ -1,7 +1,8 @@
 package com.idolu.product.application.product;
 
-import com.idolu.product.application.command.ProductCreateCommand;
-import com.idolu.product.application.command.ProductUpdateCommand;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idolu.product.application.product.command.ProductCreateCommand;
+import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
@@ -24,7 +25,13 @@ public class ProductService {
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.validateCategoriesExist(command.getCategories())
-                .flatMap((categories) -> productAdapter.createProduct(command.toEntity(categories)));
+                .flatMap((categories) -> {
+                    try {
+                        return productAdapter.createProduct(command.toEntity(categories));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     /**
@@ -48,7 +55,7 @@ public class ProductService {
                     return Mono.just(product.changeInfo(command));
                 })
                 .zipWhen(product -> categoryAdapter.validateCategoriesExist(command.getCategories()))
-                .map(TupleUtils.function(Product::withCategories))
+                .map(TupleUtils.function(Product::withProductCategories))
                 .flatMap(productAdapter::updateProduct)
                 .map(Product::getProductId);
     }

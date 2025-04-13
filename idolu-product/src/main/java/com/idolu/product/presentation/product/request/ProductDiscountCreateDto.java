@@ -1,11 +1,13 @@
 package com.idolu.product.presentation.product.request;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Getter
-public class ProductDiscountDto {
+@ToString
+public class ProductDiscountCreateDto {
 
     private Integer discountRound;
 

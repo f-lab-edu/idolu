@@ -1,6 +1,11 @@
 package com.idolu.product.presentation.product.request;
 
-public class ProductImageDto {
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
+public class ProductImageCreateDto {
 
     private String imageType;
 

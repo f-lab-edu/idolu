@@ -1,4 +1,4 @@
-package com.idolu.product.application.command;
+package com.idolu.product.application.product.command;
 
 import com.idolu.product.domain.product.type.ProductStatus;
 import lombok.Builder;

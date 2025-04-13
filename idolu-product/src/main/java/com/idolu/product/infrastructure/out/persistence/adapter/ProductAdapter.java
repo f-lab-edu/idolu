@@ -22,15 +22,21 @@ public class ProductAdapter {
 
     private final ProductRepository productRepository;
     private final ProductCategoryAdapter productCategoryAdapter;
+    private final ProductDiscountAdapter productDiscountAdapter;
+    private final ProductImageAdapter productImageAdapter;
 
     @Transactional
     public Mono<Long> createProduct(Product product) {
         return productRepository.save(product)
-                .map(ProductCategory::from)
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(productCategory -> productCategoryAdapter.saveProductCategory(productCategory)
-                        .thenReturn(productCategory.getProductId()))
-                .next();
+                .flatMap(savedProduct -> Flux.fromIterable(savedProduct.getProductCategories())
+                        .flatMap(productCategory -> productCategoryAdapter.saveProductCategory(productCategory.withProductId(savedProduct.getProductId())))
+                        .then(Mono.just(savedProduct))) // 상품 카테고리 저장
+                .flatMap(savedProduct -> Flux.fromIterable(savedProduct.getProductDiscounts())
+                        .flatMap(productDiscount -> productDiscountAdapter.saveProductDiscount(productDiscount.withProductId(savedProduct.getProductId())))
+                        .then(Mono.just(savedProduct))) // 할인 정보 저장
+                .flatMap(savedProduct -> Flux.fromIterable(savedProduct.getProductImages())
+                        .flatMap(productImage -> productImageAdapter.saveProductImage(productImage.withProductId(savedProduct.getProductId()))) // 이미지 정보 저장
+                        .then(Mono.just(savedProduct.getProductId()))); // 상품 이미지 저장 후 상품 id 반환
     }
 
     @Transactional(readOnly = true)

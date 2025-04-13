@@ -25,10 +25,16 @@ public class ProductCategory extends BaseEntity {
 
     private Long categoryId;
 
-    private Boolean deleted;
+    @Builder.Default
+    private Boolean deleted = false;
+
+    public ProductCategory withProductId(Long productId) {
+        this.productId = productId;
+        return this;
+    }
 
     public static List<ProductCategory> from(Product product) {
-        return product.getCategories().stream()
+        return product.getProductCategories().stream()
                 .map(category -> ProductCategory.builder()
                         .productId(product.getProductId())
                         .categoryId(category.getCategoryId())

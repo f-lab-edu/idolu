@@ -31,4 +31,9 @@ public class ProductDiscount extends BaseEntity {
 
     @Builder.Default
     private Boolean deleted = false;
+
+    public ProductDiscount withProductId(Long productId) {
+        this.productId = productId;
+        return this;
+    }
 }

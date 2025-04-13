@@ -1,18 +1,20 @@
 package com.idolu.product.presentation.product.request;
 
-import com.idolu.product.application.command.ProductCreateCommand;
+import com.idolu.product.application.product.command.ProductCreateCommand;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
+@ToString
 @Getter
 public class ProductCreateRequest {
-
 
     @Min(value = 1, message = "회원사 id는 1보다 커야 합니다.")
     private Long storeId;
@@ -52,30 +54,37 @@ public class ProductCreateRequest {
     @NotBlank(message = "서비스 제공주기 단위는 필수입니다.")
     private String servicePeriodUnitCode;
 
-    @NotBlank(message = "이미지 url은 필수입니다.")
-    private String imageUrl;
-
     @NotBlank(message = "상품 설명은 필수입니다.")
     private String description;
 
     @Size(min = 1, message = "상품은 최소 하나의 카테고리에 속해야 합니다.")
     private List<String> categories;
 
-    private List<ProductDiscountDto> productDiscounts;
+    private List<ProductDiscountCreateDto> productDiscounts;
 
-    private List<ProductDescriptionDto> productDescriptions;
+    private List<ProductImageCreateDto> productImages;
 
-    private List<ProductImageDto> productImages;
+    private Map<String, String> productInformation;
 
     public ProductCreateCommand toCommand() {
         return ProductCreateCommand.builder()
-                .name(this.name)
+                .storeId(this.storeId)
                 .stock(this.stock)
-                .imageUrl(this.imageUrl)
-                .description(this.description)
-                .price(this.basicPrice)
+                .name(this.name)
                 .status(this.status)
+                .applyRoundDiscount(this.applyRoundDiscount)
+                .basicPrice(this.basicPrice)
+                .sellingPrice(this.sellingPrice)
+                .discountRate(this.discountRate)
+                .discountOneTime(this.discountOneTime)
+                .contractPeriod(this.contractPeriod)
+                .contractPeriodUnitCode(this.contractPeriodUnitCode)
+                .servicePeriod(this.servicePeriod)
+                .servicePeriodUnitCode(this.servicePeriodUnitCode)
                 .categories(categories)
+                .productInformation(productInformation)
+                .productDiscountCreateDtos(productDiscounts)
+                .productImageCreateDtos(productImages)
                 .build();
     }
 }

@@ -5,6 +5,7 @@ import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
+import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -36,7 +38,7 @@ public class Product extends BaseEntity {
 
     private String name; // 상품명
 
-    private ProductStatus status; // 상품 상태
+    private ProductStatus productStatus; // 상품 상태
 
     private Boolean applyRoundDiscount; // 기간별 할인 여뷰
 
@@ -65,7 +67,7 @@ public class Product extends BaseEntity {
     private Integer version;
 
     @Transient
-    private List<Category> categories;
+    private List<ProductCategory> productCategories;
 
     @Transient
     private List<ProductDiscount> productDiscounts;
@@ -73,8 +75,13 @@ public class Product extends BaseEntity {
     @Transient
     private List<ProductImage> productImages;
 
-    public Product withCategories(List<Category> categories) {
-        this.categories = categories;
+    public Product withProductCategories(List<Category> categories) {
+        this.productCategories = categories.stream()
+                .map(category -> ProductCategory.builder()
+                        .productId(this.productId)
+                        .categoryId(category.getCategoryId())
+                        .build())
+                .collect(Collectors.toList());
         return this;
     }
 
@@ -84,7 +91,7 @@ public class Product extends BaseEntity {
                 .stock(command.getStock())
                 .name(command.getName())
                 .basicPrice(command.getPrice())
-                .status(command.getStatus())
+                .productStatus(command.getStatus())
                 .deleted(command.getDeleted())
                 .version(this.version)
                 .createdAt(this.getCreatedAt())

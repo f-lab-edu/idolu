@@ -1,6 +1,6 @@
 package com.idolu.product.presentation.product.request;
 
-import com.idolu.product.application.command.ProductUpdateCommand;
+import com.idolu.product.application.product.command.ProductUpdateCommand;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

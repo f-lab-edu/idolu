@@ -1,5 +1,6 @@
 package com.idolu.product.domain.product;
 
+import com.idolu.product.domain.product.type.ImageType;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -18,7 +19,7 @@ public class ProductImage extends BaseEntity {
 
     private Long productId; // 상품 id
 
-    private String imageType; // 이미지 유형
+    private ImageType imageType; // 이미지 유형
 
     private String url;
 
@@ -26,4 +27,9 @@ public class ProductImage extends BaseEntity {
 
     @Builder.Default
     private Boolean deleted = false;
+
+    public ProductImage withProductId(Long productId) {
+        this.productId = productId;
+        return this;
+    }
 }
