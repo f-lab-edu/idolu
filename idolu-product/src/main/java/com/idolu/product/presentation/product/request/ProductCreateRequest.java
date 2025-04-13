@@ -6,13 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@ToString
 @Getter
 public class ProductCreateRequest {
 
@@ -28,6 +26,7 @@ public class ProductCreateRequest {
     @NotBlank(message = "상품 상태값은 필수입니다.")
     private String status;
 
+    @NotNull(message = "기간별 할인 여부는 필수입니다.")
     private Boolean applyRoundDiscount;
 
     @Min(value = 1_000, message = "가격은 1000원보다 커야 합니다.")
@@ -39,7 +38,7 @@ public class ProductCreateRequest {
     @NotNull(message = "할인율 입력은 필수입니다.")
     private Integer discountRate;
 
-    @NotNull(message = "기간별 할인 여부 입력은 필수입니다.")
+    @NotNull(message = "일회성 할인 여부는 필수입니다.")
     private Boolean discountOneTime;
 
     @Min(value = 1, message = "계약 기간은 1보다 커야 합니다.")
@@ -53,9 +52,6 @@ public class ProductCreateRequest {
 
     @NotBlank(message = "서비스 제공주기 단위는 필수입니다.")
     private String servicePeriodUnitCode;
-
-    @NotBlank(message = "상품 설명은 필수입니다.")
-    private String description;
 
     @Size(min = 1, message = "상품은 최소 하나의 카테고리에 속해야 합니다.")
     private List<String> categories;

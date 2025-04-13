@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 
 @Getter
-public class ProductDiscountCreateDto {
+public class ProductDiscountUpdateDto {
 
     private Integer discountRound;
 

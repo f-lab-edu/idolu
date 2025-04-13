@@ -23,7 +23,7 @@ public class ProductCategoryAdapter {
         return productCategoryRepository.findByProductIdAndDeleted(productId, false);
     }
 
-    public Mono<Void> setDeletedByCategoryIdAndProductId(Long categoryId, Long productId) {
-        return productCategoryRepository.setDeletedByCategoryIdAndProductId(categoryId, productId);
+    public Mono<Void> setDeletedByProductId(Long productId) {
+        return productCategoryRepository.setDeletedByProductId(productId);
     }
 }

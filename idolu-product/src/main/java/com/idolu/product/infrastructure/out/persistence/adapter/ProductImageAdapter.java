@@ -16,4 +16,8 @@ public class ProductImageAdapter {
         return productImageRepository.save(productImage)
                 .then(Mono.empty());
     }
+
+    public Mono<Void> setDeletedByProductId(Long productId) {
+        return productImageRepository.setDeletedByProductId(productId);
+    }
 }

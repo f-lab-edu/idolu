@@ -16,4 +16,8 @@ public class ProductDiscountAdapter {
         return productDiscountRepository.save(productDiscount)
                 .then(Mono.empty());
     }
+
+    public Mono<Void> setDeletedByProductId(Long productId) {
+        return productDiscountRepository.setDeletedByProductId(productId);
+    }
 }

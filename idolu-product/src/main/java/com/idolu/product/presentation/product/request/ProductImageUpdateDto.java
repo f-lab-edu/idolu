@@ -1,9 +1,10 @@
 package com.idolu.product.presentation.product.request;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-public class ProductImageCreateDto {
+public class ProductImageUpdateDto {
 
     private String imageType;
 

@@ -42,8 +42,7 @@ public class ProductService {
      *   - 카테고리 정보가 없다면 예외 반환
      * 5. 상품 정보 업데이트
      * 6. Version 다른 경우 예외 반환
-     * 7. 상품에 대한 카테고리 정보 조회 후 업데이트
-     *   - 원래 있으면 그대로, 없다면 추가, 없어질 카테고리 정보는 삭제
+     * 7. 상품 세부 정보(카테고리, 할인, 이미지) 업데이트
      */
     public Mono<Long> updateProduct(ProductUpdateCommand command) {
         return productAdapter.findById(command.getProductId())

@@ -24,7 +24,6 @@ public class ProductController {
     @PostMapping("/products")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ApiResponse<ProductCreateResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
-        log.info("request', request: {}", request);
         return productService.createProduct(request.toCommand())
                 .doOnNext(id -> log.info("id {} Product 생성", id))
                 .map(id -> ApiResponse.of(HttpStatus.CREATED, ProductCreateResponse.from(id)));

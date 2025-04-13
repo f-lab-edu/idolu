@@ -55,10 +55,24 @@ public class ProductAdapter {
 
                     return e; // 다른 예외는 그대로 전달
                 })
-                .flatMapMany(updatedProduct -> productCategoryAdapter.findByProductId(updatedProduct.getProductId()))
-                .flatMap(existingProductCategory -> productCategoryAdapter.setDeletedByCategoryIdAndProductId(existingProductCategory.getCategoryId(), existingProductCategory.getProductId())) // 기존 카테고리 삭제
-                .then(Flux.fromIterable(ProductCategory.from(product)) // 새 상품 카테고리 저장
-                        .flatMap(productCategoryAdapter::saveProductCategory).then())
-                .thenReturn(product);
+                .flatMap(this::deleteOldProductRelations)
+                .flatMap(this::saveNewProductRelations);
+    }
+
+
+    private Mono<Product> deleteOldProductRelations(Product product) {
+        return Mono.when(
+                productCategoryAdapter.setDeletedByProductId(product.getProductId()),
+                productDiscountAdapter.setDeletedByProductId(product.getProductId()),
+                productImageAdapter.setDeletedByProductId(product.getProductId())
+        ).thenReturn(product);
+    }
+
+    private Mono<Product> saveNewProductRelations(Product product) {
+        return Flux.merge(
+                Flux.fromIterable(ProductCategory.from(product)).flatMap(productCategoryAdapter::saveProductCategory),
+                Flux.fromIterable(product.getProductDiscounts()).flatMap(productDiscountAdapter::saveProductDiscount),
+                Flux.fromIterable(product.getProductImages()).flatMap(productImageAdapter::saveProductImage)
+        ).then(Mono.just(product));
     }
 }
