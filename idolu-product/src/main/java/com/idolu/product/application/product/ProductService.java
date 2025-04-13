@@ -25,13 +25,7 @@ public class ProductService {
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.validateCategoriesExist(command.getCategories())
-                .flatMap((categories) -> {
-                    try {
-                        return productAdapter.createProduct(command.toEntity(categories));
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                .flatMap((categories) -> productAdapter.createProduct(command.toEntity(categories)));
     }
 
     /**

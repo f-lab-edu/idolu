@@ -98,7 +98,7 @@ public class ProductCreateCommand {
         this.productInformation = productInformation;
     }
 
-    public Product toEntity(List<Category> categories) throws JsonProcessingException {
+    public Product toEntity(List<Category> categories) {
 
         return Product.builder()
                 .storeId(this.storeId)
