@@ -135,7 +135,7 @@ public class ProductCreateCommand {
                                 .discountValue(productDiscountCreateCommand.getDiscountValue())
                                 .build())
                         .collect(Collectors.toUnmodifiableList()))
-                .productInformation(new ObjectMapper().writeValueAsString(this.productInformation.toString()))
+                .productInformation(this.productInformation)
                 .build();
     }
 }

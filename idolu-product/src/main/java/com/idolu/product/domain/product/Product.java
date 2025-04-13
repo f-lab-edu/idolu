@@ -16,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -58,7 +59,7 @@ public class Product extends BaseEntity {
 
     private PeriodUnitCode servicePeriodUnitCode; // 서비스 제공주기 단위
 
-    private String productInformation; // 상품 정보
+    private Map<String, String> productInformation; // 상품 정보
 
     @Builder.Default
     private Boolean deleted = false; // 삭제 여부
