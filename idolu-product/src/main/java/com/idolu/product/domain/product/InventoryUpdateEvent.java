@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "inventoryUpdateEventId")
 public class InventoryUpdateEvent {
 

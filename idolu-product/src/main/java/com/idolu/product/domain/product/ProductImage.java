@@ -10,7 +10,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 @Getter
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "productImageId", callSuper = false)
 public class ProductImage extends BaseEntity {
 

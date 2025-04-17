@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @Table("product")
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "productId", callSuper = false)
 public class Product extends BaseEntity {
 

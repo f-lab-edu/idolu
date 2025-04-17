@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "productDiscountId", callSuper = false)
 public class ProductDiscount extends BaseEntity {
 
