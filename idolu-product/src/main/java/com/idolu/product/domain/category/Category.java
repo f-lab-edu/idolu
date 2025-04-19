@@ -2,15 +2,13 @@ package com.idolu.product.domain.category;
 
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Getter
-@SuperBuilder
 @Table("category")
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "categoryId", callSuper = false)
 public class Category extends BaseEntity {
 
@@ -22,4 +20,13 @@ public class Category extends BaseEntity {
     private String categoryName;
 
     private Boolean deleted;
+
+    @Builder
+    public Category(LocalDateTime createdAt, LocalDateTime updatedAt, Long categoryId, String categoryCode, String categoryName, Boolean deleted) {
+        super(createdAt, updatedAt);
+        this.categoryId = categoryId;
+        this.categoryCode = categoryCode;
+        this.categoryName = categoryName;
+        this.deleted = deleted;
+    }
 }

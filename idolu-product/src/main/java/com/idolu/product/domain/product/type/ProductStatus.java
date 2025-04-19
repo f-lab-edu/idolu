@@ -1,4 +1,4 @@
-package com.idolu.product.domain.product;
+package com.idolu.product.domain.product.type;
 
 import com.idolu.product.global.exception.BaseException;
 import com.idolu.product.global.exception.ProductCreateValidationException;

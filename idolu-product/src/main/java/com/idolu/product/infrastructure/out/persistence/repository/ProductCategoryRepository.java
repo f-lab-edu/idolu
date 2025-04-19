@@ -12,6 +12,6 @@ public interface ProductCategoryRepository extends R2dbcRepository<ProductCatego
     Flux<ProductCategory> findByProductIdAndDeleted(Long productId, Boolean deleted);
 
     @Modifying
-    @Query("UPDATE product_category SET deleted = true WHERE category_id = :categoryId AND product_id = :productId")
-    Mono<Void> setDeletedByCategoryIdAndProductId(Long categoryId, Long productId);
+    @Query("UPDATE product_category SET deleted = true WHERE product_id = :productId")
+    Mono<Void> setDeletedByProductId(Long productId);
 }

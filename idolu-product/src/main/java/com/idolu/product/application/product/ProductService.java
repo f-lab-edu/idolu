@@ -1,7 +1,8 @@
 package com.idolu.product.application.product;
 
-import com.idolu.product.application.command.ProductCreateCommand;
-import com.idolu.product.application.command.ProductUpdateCommand;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.idolu.product.application.product.command.ProductCreateCommand;
+import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
@@ -35,8 +36,7 @@ public class ProductService {
      *   - 카테고리 정보가 없다면 예외 반환
      * 5. 상품 정보 업데이트
      * 6. Version 다른 경우 예외 반환
-     * 7. 상품에 대한 카테고리 정보 조회 후 업데이트
-     *   - 원래 있으면 그대로, 없다면 추가, 없어질 카테고리 정보는 삭제
+     * 7. 상품 세부 정보(카테고리, 할인, 이미지) 업데이트
      */
     public Mono<Long> updateProduct(ProductUpdateCommand command) {
         return productAdapter.findById(command.getProductId())
@@ -48,7 +48,7 @@ public class ProductService {
                     return Mono.just(product.changeInfo(command));
                 })
                 .zipWhen(product -> categoryAdapter.validateCategoriesExist(command.getCategories()))
-                .map(TupleUtils.function(Product::withCategories))
+                .map(TupleUtils.function(Product::withProductCategories))
                 .flatMap(productAdapter::updateProduct)
                 .map(Product::getProductId);
     }

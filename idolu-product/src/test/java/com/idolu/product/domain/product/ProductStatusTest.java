@@ -1,7 +1,7 @@
 package com.idolu.product.domain.product;
 
+import com.idolu.product.domain.product.type.ProductStatus;
 import com.idolu.product.global.exception.BaseException;
-import com.idolu.product.global.exception.ErrorCode;
 import com.idolu.product.global.exception.ProductCreateValidationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
-import static com.idolu.product.domain.product.ProductStatus.*;
+import static com.idolu.product.domain.product.type.ProductStatus.*;
 import static com.idolu.product.global.exception.ErrorCode.ENUM_VALIDATE_FAILED;
 import static com.idolu.product.global.exception.ErrorCode.PRODUCT_STATUS_VALIDATION_FAILED;
 import static org.assertj.core.api.Assertions.*;
