@@ -1,18 +1,14 @@
 package com.idolu.product.domain.store;
 
 import com.idolu.product.global.common.BaseEntity;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Table
 @Getter
-@SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "storeId", callSuper = false)
 public class Store extends BaseEntity {
 
@@ -32,4 +28,17 @@ public class Store extends BaseEntity {
     private String profileImageUrl;
 
     private Boolean deleted;
+
+    @Builder
+    public Store(Long storeId, String storeCode, String storeName, String representationName, String baseAddress, String detailAddress, String profileImageUrl, Boolean deleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.storeId = storeId;
+        this.storeCode = storeCode;
+        this.storeName = storeName;
+        this.representationName = representationName;
+        this.baseAddress = baseAddress;
+        this.detailAddress = detailAddress;
+        this.profileImageUrl = profileImageUrl;
+        this.deleted = deleted;
+    }
 }

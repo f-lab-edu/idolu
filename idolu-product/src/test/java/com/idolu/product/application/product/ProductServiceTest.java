@@ -3,7 +3,6 @@ package com.idolu.product.application.product;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.exception.ProductUpdateException;
-import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +13,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.idolu.product.global.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
@@ -25,9 +25,6 @@ class ProductServiceTest {
 
     @Mock
     ProductAdapter productAdapter;
-
-    @Mock
-    CategoryAdapter categoryAdapter;
 
     @InjectMocks
     ProductService productService;
@@ -61,6 +58,10 @@ class ProductServiceTest {
     private static ProductUpdateCommand createProductUpdateCommand(LocalDateTime updatedAt) {
         return ProductUpdateCommand.builder()
                 .productId(1L)
+                .contractPeriodUnitCode("MONTH")
+                .servicePeriodUnitCode("MONTH")
+                .productDiscountDtos(List.of())
+                .productImageDtos(List.of())
                 .status("ON_SALE")
                 .updatedAt(updatedAt)
                 .build();

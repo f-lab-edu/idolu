@@ -3,19 +3,16 @@ package com.idolu.product.domain.productcategory;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@SuperBuilder
-@AllArgsConstructor
 @Table("product_category")
 @EqualsAndHashCode(of = "productCategoryId", callSuper = false)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductCategory extends BaseEntity {
 
     @Id
@@ -25,8 +22,16 @@ public class ProductCategory extends BaseEntity {
 
     private Long categoryId;
 
-    @Builder.Default
-    private Boolean deleted = false;
+    private Boolean deleted;
+
+    @Builder
+    public ProductCategory(LocalDateTime createdAt, LocalDateTime updatedAt, Long productCategoryId, Long productId, Long categoryId, Boolean deleted) {
+        super(createdAt, updatedAt);
+        this.productCategoryId = productCategoryId;
+        this.productId = productId;
+        this.categoryId = categoryId;
+        this.deleted = deleted;
+    }
 
     public ProductCategory withProductId(Long productId) {
         this.productId = productId;

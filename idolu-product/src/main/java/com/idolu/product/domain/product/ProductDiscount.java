@@ -4,16 +4,14 @@ package com.idolu.product.domain.product;
 import com.idolu.product.domain.product.type.DiscountCode;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Table
 @Getter
-@SuperBuilder
-@AllArgsConstructor
 @EqualsAndHashCode(of = "productDiscountId", callSuper = false)
 public class ProductDiscount extends BaseEntity {
 
@@ -28,8 +26,18 @@ public class ProductDiscount extends BaseEntity {
 
     private DiscountCode discountCode; // 할인 유형
 
-    @Builder.Default
-    private Boolean deleted = false;
+    private Boolean deleted;
+
+    @Builder
+    public ProductDiscount(Long productDiscountId, Long productId, Integer discountRound, BigDecimal discountValue, DiscountCode discountCode, Boolean deleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.productDiscountId = productDiscountId;
+        this.productId = productId;
+        this.discountRound = discountRound;
+        this.discountValue = discountValue;
+        this.discountCode = discountCode;
+        this.deleted = deleted;
+    }
 
     public ProductDiscount withProductId(Long productId) {
         this.productId = productId;

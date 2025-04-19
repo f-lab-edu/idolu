@@ -8,22 +8,18 @@ import com.idolu.product.domain.product.type.ProductStatus;
 import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.annotation.Version;
+import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
 @ToString
-@SuperBuilder
 @Table("product")
-@AllArgsConstructor
 @EqualsAndHashCode(of = "productId", callSuper = false)
 public class Product extends BaseEntity {
 
@@ -60,7 +56,6 @@ public class Product extends BaseEntity {
 
     private Map<String, String> productInformation; // 상품 정보
 
-    @Builder.Default
     private Boolean deleted = false; // 삭제 여부
 
     @Version
@@ -74,6 +69,37 @@ public class Product extends BaseEntity {
 
     @Transient
     private List<ProductImage> productImages;
+
+    @PersistenceCreator
+    public Product(Long productId, String productIdentifier, Long storeId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this(productId, productIdentifier, storeId, stock, name,  productStatus, applyRoundDiscount, basicPrice, sellingPrice, discountRate, discountOneTime, contractPeriod, contractPeriodUnitCode, servicePeriod, servicePeriodUnitCode, productInformation, deleted, version, null, null, null, createdAt, updatedAt);
+    }
+
+    @Builder
+    public Product(Long productId, String productIdentifier, Long storeId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, List<ProductCategory> productCategories, List<ProductDiscount> productDiscounts, List<ProductImage> productImages, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.productId = productId;
+        this.productIdentifier = productIdentifier;
+        this.storeId = storeId;
+        this.stock = stock;
+        this.name = name;
+        this.productStatus = productStatus;
+        this.applyRoundDiscount = applyRoundDiscount;
+        this.basicPrice = basicPrice;
+        this.sellingPrice = sellingPrice;
+        this.discountRate = discountRate;
+        this.discountOneTime = discountOneTime;
+        this.contractPeriod = contractPeriod;
+        this.contractPeriodUnitCode = contractPeriodUnitCode;
+        this.servicePeriod = servicePeriod;
+        this.servicePeriodUnitCode = servicePeriodUnitCode;
+        this.productInformation = productInformation;
+        this.deleted = deleted;
+        this.version = version;
+        this.productCategories = productCategories;
+        this.productDiscounts = productDiscounts;
+        this.productImages = productImages;
+    }
 
     public Product withProductCategories(List<Category> categories) {
         this.productCategories = categories.stream()
@@ -112,7 +138,7 @@ public class Product extends BaseEntity {
                                 .discountValue(discountCommand.getDiscountValue())
                                 .discountCode(discountCommand.getDiscountCode())
                                 .build())
-                        .collect(Collectors.toUnmodifiableList()))
+                        .toList())
                 .productImages(command.getProductImages().stream()
                         .map(imageCommand -> ProductImage.builder()
                                 .productId(this.productId)
@@ -120,7 +146,7 @@ public class Product extends BaseEntity {
                                 .url(imageCommand.getUrl())
                                 .sortNumber(imageCommand.getSortNumber())
                                 .build())
-                        .collect(Collectors.toUnmodifiableList()))
+                        .toList())
                 .productInformation(command.getProductInformation())
                 .build();
     }

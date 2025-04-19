@@ -3,13 +3,13 @@ package com.idolu.product.domain.product;
 import com.idolu.product.domain.product.type.ImageType;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Table
 @Getter
-@SuperBuilder
 @EqualsAndHashCode(of = "productImageId", callSuper = false)
 public class ProductImage extends BaseEntity {
 
@@ -24,8 +24,18 @@ public class ProductImage extends BaseEntity {
 
     private Integer sortNumber; // 정렬 순서
 
-    @Builder.Default
-    private Boolean deleted = false;
+    private Boolean deleted;
+
+    @Builder
+    public ProductImage(Long productImageId, Long productId, ImageType imageType, String url, Integer sortNumber, Boolean deleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.productImageId = productImageId;
+        this.productId = productId;
+        this.imageType = imageType;
+        this.url = url;
+        this.sortNumber = sortNumber;
+        this.deleted = deleted;
+    }
 
     public ProductImage withProductId(Long productId) {
         this.productId = productId;
