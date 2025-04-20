@@ -1,7 +1,7 @@
 CREATE TABLE `product` (
     `product_id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT '상품 id',
     `product_identifier` varchar(50) UNIQUE COMMENT '상품 외부 id',
-    `store_id` varchar(30) COMMENT '회원사 id',
+    `store_id` bigint COMMENT '회원사 id',
     `stock` integer COMMENT '재고',
     `name` varchar(200) COMMENT '상품명',
     `product_status` varchar(50) COMMENT '상품 상태',
