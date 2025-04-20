@@ -14,6 +14,8 @@ public enum ErrorCode {
     PRODUCT_INVALID_UPDATED_TIME(HttpStatus.CONFLICT, "PRODUCT-004", "상품 마지막 수정일이 일치하지 않습니다. productId: %d"),
     PRODUCT_DUPLICATED_REQUEST(HttpStatus.CONFLICT, "PRODUCT_005", "상품 변경 시 충돌이 발생했습니다. productId: %d"),
 
+    STORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "STORE-001", "회원사 정보를 조회할 수 없습니다. storeCode: %s"),
+
     ENUM_VALIDATE_FAILED(HttpStatus.BAD_REQUEST, "COMMON-001", "변환할 타입이 없습니다. value: %s"),
     ;
 
