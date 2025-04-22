@@ -7,6 +7,7 @@ import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.domain.store.Store;
 import com.idolu.product.global.exception.ProductNotFoundException;
 import com.idolu.product.global.exception.ProductUpdateException;
+import com.idolu.product.global.util.SqlBuilder;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.ProductItemDto;
 import lombok.RequiredArgsConstructor;
@@ -52,9 +53,9 @@ public class ProductAdapter {
                         .then(Mono.just(savedProduct.getProductId()))); // 상품 이미지 저장 후 상품 id 반환
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Flux<ProductItemDto> selectProducts(ProductSearchCommand productSearchCommand, Store store, List<Category> categories) {
-        StringBuilder sqlBuilder = new StringBuilder("""
+        SqlBuilder sqlBuilder = new SqlBuilder("""
                             SELECT DISTINCT p.product_id,
                                 p.name,
                                 p.product_status,
@@ -77,24 +78,15 @@ public class ProductAdapter {
                               AND pc.deleted = FALSE
                 """);
 
-        if (!Objects.isNull(productSearchCommand.getLastProductId())) {
-            sqlBuilder.append(" AND p.product_id < :productId");
-        }
-
-        sqlBuilder.append(" ORDER BY p.created_at DESC LIMIT :limit ");
-
-        DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(sqlBuilder.toString())
+        return sqlBuilder.appendIfPresent("AND p.product_id < :productId", productSearchCommand.getLastProductId())
+                .append("ORDER BY p.created_at DESC LIMIT :limit ", productSearchCommand.getItemCount())
+                .execute(databaseClient)
                 .bind("storeId", store.getStoreId())
                 .bind("categoryIds", categories.stream()
                         .map(Category::getCategoryId)
                         .toList())
-                .bind("limit", productSearchCommand.getItemCount());
-
-        if (!Objects.isNull(productSearchCommand.getLastProductId())) {
-            spec.bind("productId", productSearchCommand.getLastProductId());
-        }
-
-        return spec.map((row, meta) -> ProductItemDto.builder()
+                .bind("limit", productSearchCommand.getItemCount())
+                .map((row, meta) -> ProductItemDto.builder()
                         .productId(row.get("product_id", Long.class))
                         .name(row.get("name", String.class))
                         .productStatus(toProductStatus(row.get("product_status", String.class)))
