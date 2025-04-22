@@ -79,7 +79,8 @@ public class ProductAdapter {
                 """);
 
         return sqlBuilder.appendIfPresent("AND p.product_id < :productId", productSearchCommand.getLastProductId())
-                .append("ORDER BY p.created_at DESC LIMIT :limit ", productSearchCommand.getItemCount())
+                .append(productSearchCommand.getSortType().whereSortType())
+                .append("LIMIT :limit ", productSearchCommand.getItemCount())
                 .execute(databaseClient)
                 .bind("storeId", store.getStoreId())
                 .bind("categoryIds", categories.stream()
@@ -121,7 +122,6 @@ public class ProductAdapter {
                 .flatMap(this::deleteOldProductRelations)
                 .flatMap(this::saveNewProductRelations);
     }
-
 
     private Mono<Product> deleteOldProductRelations(Product product) {
         return Mono.when(

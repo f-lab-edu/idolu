@@ -13,4 +13,12 @@ public enum SortType {
                 .findAny()
                 .orElse(LATEST); // default
     }
+
+    public String whereSortType() {
+        return switch (this) {
+            case LATEST -> "ORDER BY p.created_at DESC ";
+            case PRICE_LOW -> "ORDER BY p.selling_price ASC, p.created_at DESC ";
+            case PRICE_HIGH -> "ORDER BY p.selling_price DESC, p.created_at DESC ";
+        };
+    }
 }
