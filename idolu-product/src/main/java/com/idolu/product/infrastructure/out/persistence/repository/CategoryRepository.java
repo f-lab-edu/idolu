@@ -10,4 +10,6 @@ import java.util.List;
 public interface CategoryRepository extends R2dbcRepository<Category, Long> {
 
     Flux<Category> findByCategoryCodeInAndDeleted(Collection<String> categoryCode, Boolean deleted);
+
+    Flux<Category> findByCategoryCodeLike(String categoryCode);
 }

@@ -1,12 +1,14 @@
 package com.idolu.product.application.product;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idolu.product.application.product.command.ProductCreateCommand;
+import com.idolu.product.application.product.command.ProductSearchCommand;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.adapter.CategoryAdapter;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
+import com.idolu.product.infrastructure.out.persistence.adapter.StoreAdapter;
+import com.idolu.product.presentation.product.response.ProductListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,30 @@ public class ProductService {
 
     private final ProductAdapter productAdapter;
     private final CategoryAdapter categoryAdapter;
+    private final StoreAdapter storeAdapter;
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.validateCategoriesExist(command.getCategories())
                 .flatMap((categories) -> productAdapter.createProduct(command.toEntity(categories)));
+    }
+
+    /**
+     * 1. 회원사 정보 조회
+     *   - 회원사가 없다면 예외 반환
+     * 2. 카테고리 리스트 조회
+     *   - 카테고리가 없다면 예외 반환
+     * 3. 카테고리 리스트에 대한 상품 정보 조회(최신순) 및 반환
+     *   - 마지막 product_id 기준으로 20개 조회
+     */
+    public Mono<ProductListResponse> selectProducts(ProductSearchCommand productSearchCommand) {
+        return storeAdapter.findByStoreCode(productSearchCommand.getStoreCode())
+                .zipWhen(data -> categoryAdapter.findByCategoryCodeLike(productSearchCommand.getCategoryCode()))
+                .flatMapMany(TupleUtils.function((store, categories) -> productAdapter.selectProducts(productSearchCommand, store, categories)))
+                .collectList()
+                .map(productItemDtos -> ProductListResponse.builder()
+                        .products(productItemDtos)
+                        .build());
+
     }
 
     /**
