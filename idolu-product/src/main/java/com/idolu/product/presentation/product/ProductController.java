@@ -6,6 +6,7 @@ import com.idolu.product.presentation.product.request.ProductCreateRequest;
 import com.idolu.product.presentation.product.request.ProductSearchRequest;
 import com.idolu.product.presentation.product.request.ProductUpdateRequest;
 import com.idolu.product.presentation.product.response.ProductCreateResponse;
+import com.idolu.product.presentation.product.response.ProductDetailResponse;
 import com.idolu.product.presentation.product.response.ProductListResponse;
 import com.idolu.product.presentation.product.response.ProductUpdateResponse;
 import jakarta.validation.Valid;
@@ -34,6 +35,12 @@ public class ProductController {
     @GetMapping("/products")
     public Mono<ApiResponse<ProductListResponse>> selectProducts(@ModelAttribute ProductSearchRequest productSearchRequest) {
         return productService.selectProducts(productSearchRequest.toCommand())
+                .map(ApiResponse::ok);
+    }
+
+    @GetMapping("/products/{productId}")
+    public Mono<ApiResponse<ProductDetailResponse>> selectProductByProductId(@PathVariable Long productId) {
+        return productService.selectProductByProductId(productId)
                 .map(ApiResponse::ok);
     }
 
