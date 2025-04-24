@@ -58,9 +58,9 @@ public class ProductService {
 
     public Mono<ProductDetailResponse> selectProductByProductId(Long productId) {
         return Mono.zip(productAdapter.findById(productId),
-                        productImageAdapter.findByProductId(productId),
-                        productDiscountAdapter.findByProductId(productId))
-                .map(TupleUtils.function(this::productDetailResponse));
+                        productImageAdapter.findByProductId(productId).collectList(),
+                        productDiscountAdapter.findByProductId(productId).collectList())
+                .map(TupleUtils.function(this::generateProductDetailResponse));
     }
 
     /**
@@ -88,7 +88,7 @@ public class ProductService {
                 .map(Product::getProductId);
     }
 
-    private ProductDetailResponse productDetailResponse(Product product, List<ProductImage> productImages, List<ProductDiscount> productDiscounts) {
+    private ProductDetailResponse generateProductDetailResponse(Product product, List<ProductImage> productImages, List<ProductDiscount> productDiscounts) {
         return ProductDetailResponse.builder()
                 .productId(product.getProductId())
                 .productIdentifier(product.getProductIdentifier())
