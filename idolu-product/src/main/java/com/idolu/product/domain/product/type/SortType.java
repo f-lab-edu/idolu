@@ -14,7 +14,7 @@ public enum SortType {
                 .orElse(LATEST); // default
     }
 
-    public String whereSortType() {
+    public String orderSortType() {
         return switch (this) {
             case LATEST -> "ORDER BY p.created_at DESC ";
             case PRICE_LOW -> "ORDER BY p.selling_price ASC, p.created_at DESC ";

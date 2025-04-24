@@ -21,8 +21,6 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.idolu.product.domain.product.type.PeriodUnitCode.toPeriodUnitCode;
 import static com.idolu.product.domain.product.type.ProductStatus.toProductStatus;
@@ -79,7 +77,7 @@ public class ProductAdapter {
                 """);
 
         return sqlBuilder.appendIfPresent("AND p.product_id < :productId", productSearchCommand.getLastProductId())
-                .append(productSearchCommand.getSortType().whereSortType())
+                .append(productSearchCommand.getSortType().orderSortType())
                 .append("LIMIT :limit ", productSearchCommand.getItemCount())
                 .execute(databaseClient)
                 .bind("storeId", store.getStoreId())
