@@ -11,7 +11,7 @@ public class ProductSearchCommand {
 
     private String storeCode;
 
-    private String categoryCode;
+    private Long categoryId;
 
     private SortType sortType;
 
@@ -20,9 +20,9 @@ public class ProductSearchCommand {
     private Integer itemCount;
 
     @Builder
-    public ProductSearchCommand(String storeCode, String categoryCode, String sortType, Long lastProductId, Integer itemCount) {
+    public ProductSearchCommand(String storeCode, Long categoryId, String sortType, Long lastProductId, Integer itemCount) {
         this.storeCode = storeCode;
-        this.categoryCode = categoryCode;
+        this.categoryId = categoryId;
         this.sortType = toSortType(sortType);
         this.lastProductId = lastProductId;
         this.itemCount = itemCount;

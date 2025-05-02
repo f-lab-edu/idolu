@@ -11,7 +11,7 @@ public class ProductSearchRequest {
 
     private String storeCode;
 
-    private String categoryCode;
+    private Long categoryId;
 
     private String sortType;
 
@@ -22,7 +22,7 @@ public class ProductSearchRequest {
     public ProductSearchCommand toCommand() {
         return ProductSearchCommand.builder()
                 .storeCode(this.storeCode)
-                .categoryCode(this.categoryCode)
+                .categoryId(this.categoryId)
                 .sortType(this.sortType)
                 .lastProductId(this.lastProductId)
                 .itemCount(this.itemCount <= 100 ? itemCount : 20)

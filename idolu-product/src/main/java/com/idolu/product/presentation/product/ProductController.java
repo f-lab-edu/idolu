@@ -32,8 +32,8 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public Mono<ApiResponse<ProductListResponse>> selectProducts(@ModelAttribute ProductSearchRequest productSearchRequest) {
-        return productService.selectProducts(productSearchRequest.toCommand())
+    public Mono<ApiResponse<ProductListResponse>> getProductsByCategoryAndStore(@ModelAttribute ProductSearchRequest productSearchRequest) {
+        return productService.getProductsByCategoryAndStore(productSearchRequest.toCommand())
                 .map(ApiResponse::ok);
     }
 

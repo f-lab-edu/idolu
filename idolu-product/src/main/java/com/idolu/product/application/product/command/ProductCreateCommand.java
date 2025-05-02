@@ -1,14 +1,11 @@
 package com.idolu.product.application.product.command;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductDiscount;
 import com.idolu.product.domain.product.ProductImage;
 import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
-import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.presentation.product.request.ProductDiscountCreateDto;
 import com.idolu.product.presentation.product.request.ProductImageCreateDto;
 import lombok.Builder;
@@ -19,7 +16,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.idolu.product.domain.product.type.PeriodUnitCode.toPeriodUnitCode;
 import static com.idolu.product.domain.product.type.ProductStatus.validateInitialState;
@@ -44,8 +40,6 @@ public class ProductCreateCommand {
 
     private Integer discountRate;
 
-    private Boolean discountOneTime;
-
     private Integer contractPeriod;
 
     private PeriodUnitCode contractPeriodUnitCode;
@@ -54,7 +48,7 @@ public class ProductCreateCommand {
 
     private PeriodUnitCode servicePeriodUnitCode;
 
-    private List<String> categories;
+    private Long categoryId;
 
     private Boolean deleted;
 
@@ -65,7 +59,7 @@ public class ProductCreateCommand {
     private Map<String, String> productInformation;
 
     @Builder
-    public ProductCreateCommand(Long storeId, Integer stock, String name, String status, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, String contractPeriodUnitCode, Integer servicePeriod, String servicePeriodUnitCode, List<String> categories, List<ProductImageCreateDto> productImageCreateDtos, List<ProductDiscountCreateDto> productDiscountCreateDtos, Map<String, String> productInformation) {
+    public ProductCreateCommand(Long storeId, Integer stock, String name, String status, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Integer contractPeriod, String contractPeriodUnitCode, Integer servicePeriod, String servicePeriodUnitCode, Long categoryId, List<ProductImageCreateDto> productImageCreateDtos, List<ProductDiscountCreateDto> productDiscountCreateDtos, Map<String, String> productInformation) {
         this.storeId = storeId;
         this.stock = stock;
         this.name = name;
@@ -74,12 +68,11 @@ public class ProductCreateCommand {
         this.basicPrice = basicPrice;
         this.sellingPrice = sellingPrice;
         this.discountRate = discountRate;
-        this.discountOneTime = discountOneTime;
         this.contractPeriod = contractPeriod;
         this.contractPeriodUnitCode = toPeriodUnitCode(contractPeriodUnitCode);
         this.servicePeriod = servicePeriod;
         this.servicePeriodUnitCode = toPeriodUnitCode(servicePeriodUnitCode);
-        this.categories = categories;
+        this.categoryId = categoryId;
         this.deleted = false;
         this.productImageCreateCommands = productImageCreateDtos.stream()
                 .map(dto -> ProductImageCreateCommand.builder()
@@ -98,29 +91,24 @@ public class ProductCreateCommand {
         this.productInformation = productInformation;
     }
 
-    public Product toEntity(List<Category> categories) {
+    public Product toEntity(Long categoryId) {
 
         return Product.builder()
-                .storeId(this.storeId)
                 .productIdentifier(UUID.randomUUID().toString())
+                .storeId(this.storeId)
+                .categoryId(categoryId)
                 .name(this.name)
                 .stock(this.stock)
                 .applyRoundDiscount(this.applyRoundDiscount)
                 .basicPrice(this.basicPrice)
                 .sellingPrice(this.sellingPrice)
                 .discountRate(this.discountRate)
-                .discountOneTime(this.discountOneTime)
                 .productStatus(this.productStatus)
                 .contractPeriod(this.contractPeriod)
                 .contractPeriodUnitCode(this.contractPeriodUnitCode)
                 .servicePeriod(this.servicePeriod)
                 .servicePeriodUnitCode(this.servicePeriodUnitCode)
                 .deleted(this.deleted)
-                .productCategories(categories.stream()
-                        .map(category -> ProductCategory.builder()
-                                .categoryId(category.getCategoryId())
-                                .build())
-                        .toList())
                 .productImages(productImageCreateCommands.stream()
                         .map(productImageCreateCommand -> ProductImage.builder()
                                 .imageType(productImageCreateCommand.getImageType())

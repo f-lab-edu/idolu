@@ -15,18 +15,18 @@ public class Category extends BaseEntity {
     @Id
     private Long categoryId;
 
-    private String categoryCode;
+    private String group1;
 
-    private String categoryName;
+    private String group2;
 
     private Boolean deleted;
 
     @Builder
-    public Category(LocalDateTime createdAt, LocalDateTime updatedAt, Long categoryId, String categoryCode, String categoryName, Boolean deleted) {
-        super(createdAt, updatedAt);
+    public Category(LocalDateTime createdAt, LocalDateTime updatedAt, Long categoryId, String group1, String group2, Boolean deleted) {
+        super(createdAt, updatedAt) ;
         this.categoryId = categoryId;
-        this.categoryCode = categoryCode;
-        this.categoryName = categoryName;
+        this.group1 = group1;
+        this.group2 = group2;
         this.deleted = deleted;
     }
 }
