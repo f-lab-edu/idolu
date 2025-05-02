@@ -25,7 +25,7 @@ public class ProductSearchRequest {
                 .categoryId(this.categoryId)
                 .sortType(this.sortType)
                 .lastProductId(this.lastProductId)
-                .itemCount(this.itemCount <= 100 ? itemCount : 20)
+                .itemCount(this.itemCount)
                 .build();
     }
 }
