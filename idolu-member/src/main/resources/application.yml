@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: local
+---
+server:
+  port: 10020
+spring:
+  config:
+    activate:
+      on-profile: local
+  r2dbc:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
