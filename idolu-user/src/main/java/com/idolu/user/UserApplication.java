@@ -1,13 +1,13 @@
-package com.idolu.idolumember;
+package com.idolu.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class IdoluMemberApplication {
+public class UserApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(IdoluMemberApplication.class, args);
+        SpringApplication.run(UserApplication.class, args);
     }
 
 }
