@@ -3,11 +3,9 @@ package com.idolu.product.infrastructure.out.persistence.adapter;
 import com.idolu.product.application.product.command.ProductSearchCommand;
 import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.domain.store.Store;
 import com.idolu.product.global.exception.ProductNotFoundException;
 import com.idolu.product.global.exception.ProductUpdateException;
-import com.idolu.product.global.util.SqlBuilder;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.ProductItemDto;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +30,6 @@ import static com.idolu.product.global.exception.ErrorCode.*;
 public class ProductAdapter {
 
     private final ProductRepository productRepository;
-    private final ProductCategoryAdapter productCategoryAdapter;
     private final ProductDiscountAdapter productDiscountAdapter;
     private final ProductImageAdapter productImageAdapter;
     private final DatabaseClient databaseClient;
@@ -40,9 +37,6 @@ public class ProductAdapter {
     @Transactional
     public Mono<Long> createProduct(Product product) {
         return productRepository.save(product)
-                .flatMap(savedProduct -> Flux.fromIterable(savedProduct.getProductCategories())
-                        .flatMap(productCategory -> productCategoryAdapter.saveProductCategory(productCategory.withProductId(savedProduct.getProductId())))
-                        .then(Mono.just(savedProduct))) // 상품 카테고리 저장
                 .flatMap(savedProduct -> Flux.fromIterable(savedProduct.getProductDiscounts())
                         .flatMap(productDiscount -> productDiscountAdapter.saveProductDiscount(productDiscount.withProductId(savedProduct.getProductId())))
                         .then(Mono.just(savedProduct))) // 할인 정보 저장
@@ -52,9 +46,9 @@ public class ProductAdapter {
     }
 
     @Transactional(readOnly = true)
-    public Flux<ProductItemDto> selectProducts(ProductSearchCommand productSearchCommand, Store store, List<Category> categories) {
-        SqlBuilder sqlBuilder = new SqlBuilder("""
-                            SELECT DISTINCT p.product_id,
+    public Flux<ProductItemDto> getProductByCategoryAndStore(ProductSearchCommand productSearchCommand, Store store, Category category) {
+        StringBuilder sqlBuilder = new StringBuilder("""
+                            SELECT p.product_id,
                                 p.name,
                                 p.product_status,
                                 p.basic_price,
@@ -68,36 +62,43 @@ public class ProductAdapter {
                                 p.created_at
                             FROM product p
                             JOIN store s ON s.store_id = p.store_id AND s.store_id = :storeId
-                            JOIN product_category pc ON pc.product_id = p.product_id AND pc.category_id IN (:categoryIds)
                             JOIN product_image pi ON pi.product_id = p.product_id AND pi.image_type = 'MAIN' AND pi.sort_number = 1
-                            WHERE p.deleted = FALSE
+                            WHERE p.category_id = :categoryId
+                              AND p.deleted = FALSE
                               AND s.deleted = FALSE
                               AND pi.deleted = FALSE
-                              AND pc.deleted = FALSE
                 """);
 
-        return sqlBuilder.appendIfPresent("AND p.product_id < :productId", productSearchCommand.getLastProductId())
-                .append(productSearchCommand.getSortType().orderSortType())
-                .append("LIMIT :limit ", productSearchCommand.getItemCount())
-                .execute(databaseClient)
+        if (productSearchCommand.getLastProductId() != null) {
+            sqlBuilder.append("AND p.product_id < :productId ");
+        }
+
+        sqlBuilder.append(productSearchCommand.getSortType().orderSortType());
+        sqlBuilder.append("LIMIT :limit");
+
+        DatabaseClient.GenericExecuteSpec executeSpec = databaseClient.sql(sqlBuilder.toString())
                 .bind("storeId", store.getStoreId())
-                .bind("categoryIds", categories.stream()
-                        .map(Category::getCategoryId)
-                        .toList())
-                .bind("limit", productSearchCommand.getItemCount())
-                .map((row, meta) -> ProductItemDto.builder()
-                        .productId(row.get("product_id", Long.class))
-                        .name(row.get("name", String.class))
-                        .productStatus(toProductStatus(row.get("product_status", String.class)))
-                        .basicPrice(row.get("basic_price", BigDecimal.class))
-                        .sellingPrice(row.get("selling_price", BigDecimal.class))
-                        .discountRate(row.get("discount_rate", Integer.class))
-                        .contractPeriod(row.get("contract_period", Integer.class))
-                        .contractPeriodUnitCode(toPeriodUnitCode(row.get("contract_period_unit_code", String.class)))
-                        .servicePeriod(row.get("service_period", Integer.class))
-                        .servicePeriodUnitCode(toPeriodUnitCode(row.get("service_period_unit_code", String.class)))
-                        .thumbnailUrl(row.get("thumbnail_url", String.class))
-                        .build())
+                .bind("categoryId", category.getCategoryId())
+                .bind("limit", productSearchCommand.getItemCount());
+
+        if (productSearchCommand.getLastProductId() != null) {
+            executeSpec = executeSpec.bind("productId", productSearchCommand.getLastProductId());
+        }
+
+        return executeSpec.map((row, meta) ->
+                        ProductItemDto.builder()
+                                .productId(row.get("product_id", Long.class))
+                                .name(row.get("name", String.class))
+                                .productStatus(toProductStatus(row.get("product_status", String.class)))
+                                .basicPrice(row.get("basic_price", BigDecimal.class))
+                                .sellingPrice(row.get("selling_price", BigDecimal.class))
+                                .discountRate(row.get("discount_rate", Integer.class))
+                                .contractPeriod(row.get("contract_period", Integer.class))
+                                .contractPeriodUnitCode(toPeriodUnitCode(row.get("contract_period_unit_code", String.class)))
+                                .servicePeriod(row.get("service_period", Integer.class))
+                                .servicePeriodUnitCode(toPeriodUnitCode(row.get("service_period_unit_code", String.class)))
+                                .thumbnailUrl(row.get("thumbnail_url", String.class))
+                                .build())
                 .all();
     }
 
@@ -123,7 +124,6 @@ public class ProductAdapter {
 
     private Mono<Product> deleteOldProductRelations(Product product) {
         return Mono.when(
-                productCategoryAdapter.setDeletedByProductId(product.getProductId()),
                 productDiscountAdapter.setDeletedByProductId(product.getProductId()),
                 productImageAdapter.setDeletedByProductId(product.getProductId())
         ).thenReturn(product);
@@ -131,7 +131,6 @@ public class ProductAdapter {
 
     private Mono<Product> saveNewProductRelations(Product product) {
         return Flux.merge(
-                Flux.fromIterable(ProductCategory.from(product)).flatMap(productCategoryAdapter::saveProductCategory),
                 Flux.fromIterable(product.getProductDiscounts()).flatMap(productDiscountAdapter::saveProductDiscount),
                 Flux.fromIterable(product.getProductImages()).flatMap(productImageAdapter::saveProductImage)
         ).then(Mono.just(product));

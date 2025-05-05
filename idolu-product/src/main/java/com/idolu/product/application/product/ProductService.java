@@ -33,8 +33,8 @@ public class ProductService {
     private final ProductDiscountAdapter productDiscountAdapter;
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
-        return categoryAdapter.validateCategoriesExist(command.getCategories())
-                .flatMap((categories) -> productAdapter.createProduct(command.toEntity(categories)));
+        return categoryAdapter.findByCategoryId(command.getCategoryId())
+                .flatMap(category -> productAdapter.createProduct(command.toEntity(category.getCategoryId())));
     }
 
     /**
@@ -45,15 +45,14 @@ public class ProductService {
      * 3. 카테고리 리스트에 대한 상품 정보 조회(최신순) 및 반환
      * - 마지막 product_id 기준으로 20개 조회
      */
-    public Mono<ProductListResponse> selectProducts(ProductSearchCommand productSearchCommand) {
+    public Mono<ProductListResponse> getProductsByCategoryAndStore(ProductSearchCommand productSearchCommand) {
         return storeAdapter.findByStoreCode(productSearchCommand.getStoreCode())
-                .zipWhen(data -> categoryAdapter.findByCategoryCodeLike(productSearchCommand.getCategoryCode()))
-                .flatMapMany(TupleUtils.function((store, categories) -> productAdapter.selectProducts(productSearchCommand, store, categories)))
+                .zipWhen(store -> categoryAdapter.findByCategoryId(productSearchCommand.getCategoryId()))
+                .flatMapMany(TupleUtils.function((store, category) -> productAdapter.getProductByCategoryAndStore(productSearchCommand, store, category)))
                 .collectList()
                 .map(productItemDtos -> ProductListResponse.builder()
                         .products(productItemDtos)
                         .build());
-
     }
 
     public Mono<ProductDetailResponse> selectProductByProductId(Long productId) {
@@ -71,7 +70,7 @@ public class ProductService {
      * - 카테고리 정보가 없다면 예외 반환
      * 5. 상품 정보 업데이트
      * 6. Version 다른 경우 예외 반환
-     * 7. 상품 세부 정보(카테고리, 할인, 이미지) 업데이트
+     * 7. 상품 세부 정보(할인, 이미지) 업데이트
      */
     public Mono<Long> updateProduct(ProductUpdateCommand command) {
         return productAdapter.findById(command.getProductId())
@@ -82,8 +81,8 @@ public class ProductService {
 
                     return Mono.just(product.changeInfo(command));
                 })
-                .zipWhen(product -> categoryAdapter.validateCategoriesExist(command.getCategories()))
-                .map(TupleUtils.function(Product::withProductCategories))
+                .flatMap(product -> categoryAdapter.findByCategoryId(command.getCategoryId())
+                        .then(Mono.just(product)))
                 .flatMap(productAdapter::updateProduct)
                 .map(Product::getProductId);
     }

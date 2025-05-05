@@ -42,8 +42,6 @@ public class ProductUpdateCommand {
 
     private Integer discountRate;
 
-    private Boolean discountOneTime;
-
     private Integer contractPeriod;
 
     private PeriodUnitCode contractPeriodUnitCode;
@@ -52,7 +50,7 @@ public class ProductUpdateCommand {
 
     private PeriodUnitCode servicePeriodUnitCode;
 
-    private List<String> categories;
+    private Long categoryId;
 
     private Boolean deleted;
 
@@ -65,7 +63,7 @@ public class ProductUpdateCommand {
     private Map<String, String> productInformation;
 
     @Builder
-    public ProductUpdateCommand(String status, Long productId, Long storeId, Integer stock, String name, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, String contractPeriodUnitCode, Integer servicePeriod, String servicePeriodUnitCode, List<String> categories, Boolean deleted, LocalDateTime updatedAt, List<ProductDiscountUpdateDto> productDiscountDtos, List<ProductImageUpdateDto> productImageDtos, Map<String, String> productInformation) {
+    public ProductUpdateCommand(String status, Long productId, Long storeId, Integer stock, String name, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Integer contractPeriod, String contractPeriodUnitCode, Integer servicePeriod, String servicePeriodUnitCode, Long categoryId, Boolean deleted, LocalDateTime updatedAt, List<ProductDiscountUpdateDto> productDiscountDtos, List<ProductImageUpdateDto> productImageDtos, Map<String, String> productInformation) {
         this.productId = productId;
         this.status = toProductStatus(status);
         this.storeId = storeId;
@@ -75,12 +73,11 @@ public class ProductUpdateCommand {
         this.basicPrice = basicPrice;
         this.sellingPrice = sellingPrice;
         this.discountRate = discountRate;
-        this.discountOneTime = discountOneTime;
         this.contractPeriod = contractPeriod;
         this.contractPeriodUnitCode = toPeriodUnitCode(contractPeriodUnitCode);
         this.servicePeriod = servicePeriod;
         this.servicePeriodUnitCode = toPeriodUnitCode(servicePeriodUnitCode);
-        this.categories = categories;
+        this.categoryId = categoryId;
         this.deleted = deleted;
         this.updatedAt = updatedAt;
         this.productDiscounts = productDiscountDtos.stream()

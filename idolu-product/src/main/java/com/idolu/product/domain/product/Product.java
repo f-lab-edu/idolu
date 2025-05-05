@@ -1,11 +1,8 @@
 package com.idolu.product.domain.product;
 
-
 import com.idolu.product.application.product.command.ProductUpdateCommand;
-import com.idolu.product.domain.category.Category;
 import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
-import com.idolu.product.domain.productcategory.ProductCategory;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.*;
@@ -15,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 @ToString
@@ -30,6 +26,8 @@ public class Product extends BaseEntity {
 
     private Long storeId; // 회원사 id
 
+    private Long categoryId; // 카테고리 id
+
     private Integer stock; // 재고
 
     private String name; // 상품명
@@ -43,8 +41,6 @@ public class Product extends BaseEntity {
     private BigDecimal sellingPrice; // 할인 가격
 
     private Integer discountRate; // 할인율
-
-    private Boolean discountOneTime; // 일회성 할인 여부
 
     private Integer contractPeriod; // 계약 기간
 
@@ -62,25 +58,23 @@ public class Product extends BaseEntity {
     private Integer version;
 
     @Transient
-    private List<ProductCategory> productCategories;
-
-    @Transient
     private List<ProductDiscount> productDiscounts;
 
     @Transient
     private List<ProductImage> productImages;
 
     @PersistenceCreator
-    public Product(Long productId, String productIdentifier, Long storeId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this(productId, productIdentifier, storeId, stock, name,  productStatus, applyRoundDiscount, basicPrice, sellingPrice, discountRate, discountOneTime, contractPeriod, contractPeriodUnitCode, servicePeriod, servicePeriodUnitCode, productInformation, deleted, version, null, null, null, createdAt, updatedAt);
+    public Product(Long productId, String productIdentifier, Long storeId, Long categoryId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this(productId, productIdentifier, storeId, categoryId, stock, name,  productStatus, applyRoundDiscount, basicPrice, sellingPrice, discountRate, contractPeriod, contractPeriodUnitCode, servicePeriod, servicePeriodUnitCode, productInformation, deleted, version, null, null, createdAt, updatedAt);
     }
 
     @Builder
-    public Product(Long productId, String productIdentifier, Long storeId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Boolean discountOneTime, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, List<ProductCategory> productCategories, List<ProductDiscount> productDiscounts, List<ProductImage> productImages, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Product(Long productId, String productIdentifier, Long storeId, Long categoryId, Integer stock, String name, ProductStatus productStatus, Boolean applyRoundDiscount, BigDecimal basicPrice, BigDecimal sellingPrice, Integer discountRate, Integer contractPeriod, PeriodUnitCode contractPeriodUnitCode, Integer servicePeriod, PeriodUnitCode servicePeriodUnitCode, Map<String, String> productInformation, Boolean deleted, Integer version, List<ProductDiscount> productDiscounts, List<ProductImage> productImages, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
         this.productId = productId;
         this.productIdentifier = productIdentifier;
         this.storeId = storeId;
+        this.categoryId = categoryId;
         this.stock = stock;
         this.name = name;
         this.productStatus = productStatus;
@@ -88,7 +82,6 @@ public class Product extends BaseEntity {
         this.basicPrice = basicPrice;
         this.sellingPrice = sellingPrice;
         this.discountRate = discountRate;
-        this.discountOneTime = discountOneTime;
         this.contractPeriod = contractPeriod;
         this.contractPeriodUnitCode = contractPeriodUnitCode;
         this.servicePeriod = servicePeriod;
@@ -96,25 +89,15 @@ public class Product extends BaseEntity {
         this.productInformation = productInformation;
         this.deleted = deleted;
         this.version = version;
-        this.productCategories = productCategories;
         this.productDiscounts = productDiscounts;
         this.productImages = productImages;
-    }
-
-    public Product withProductCategories(List<Category> categories) {
-        this.productCategories = categories.stream()
-                .map(category -> ProductCategory.builder()
-                        .productId(this.productId)
-                        .categoryId(category.getCategoryId())
-                        .build())
-                .collect(Collectors.toList());
-        return this;
     }
 
     public Product changeInfo(ProductUpdateCommand command) {
         return Product.builder()
                 .productId(this.productId)
                 .storeId(this.storeId)
+                .categoryId(command.getCategoryId())
                 .productIdentifier(this.productIdentifier)
                 .stock(command.getStock())
                 .name(command.getName())
@@ -123,7 +106,6 @@ public class Product extends BaseEntity {
                 .basicPrice(command.getBasicPrice())
                 .sellingPrice(command.getSellingPrice())
                 .discountRate(command.getDiscountRate())
-                .discountOneTime(command.getDiscountOneTime())
                 .contractPeriod(command.getContractPeriod())
                 .contractPeriodUnitCode(command.getContractPeriodUnitCode())
                 .servicePeriod(command.getServicePeriod())

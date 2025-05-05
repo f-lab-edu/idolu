@@ -42,9 +42,6 @@ public class ProductUpdateRequest {
     @NotNull(message = "할인율 입력은 필수입니다.")
     private Integer discountRate;
 
-    @NotNull(message = "일회성 할인 여부는 필수입니다.")
-    private Boolean discountOneTime;
-
     @Min(value = 1, message = "계약 기간은 1보다 커야 합니다.")
     private Integer contractPeriod;
 
@@ -57,8 +54,8 @@ public class ProductUpdateRequest {
     @NotBlank(message = "서비스 제공주기 단위는 필수입니다.")
     private String servicePeriodUnitCode;
 
-    @Size(min = 1, message = "상품은 최소 하나의 카테고리에 속해야 합니다.")
-    private List<String> categories;
+    @Min(value = 1, message = "상품은 최소 하나의 카테고리에 속해야 합니다.")
+    private Long categoryId;
 
     @NotNull(message = "삭제 여부는 필수입니다.")
     private Boolean deleted;
@@ -83,12 +80,11 @@ public class ProductUpdateRequest {
                 .basicPrice(this.basicPrice)
                 .sellingPrice(this.sellingPrice)
                 .discountRate(this.discountRate)
-                .discountOneTime(this.discountOneTime)
                 .contractPeriod(this.contractPeriod)
                 .contractPeriodUnitCode(this.contractPeriodUnitCode)
                 .servicePeriod(this.servicePeriod)
                 .servicePeriodUnitCode(this.servicePeriodUnitCode)
-                .categories(this.categories)
+                .categoryId(this.categoryId)
                 .deleted(this.deleted)
                 .status(this.status)
                 .updatedAt(this.updatedAt)
