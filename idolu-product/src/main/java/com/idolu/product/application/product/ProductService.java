@@ -99,7 +99,6 @@ public class ProductService {
                         .sellingPrice(product.getSellingPrice())
                         .discountRate(product.getDiscountRate())
                         .build())
-                .discountOneTime(product.getDiscountOneTime())
                 .term(SubscriptionTermDto.builder()
                         .contractPeriod(product.getContractPeriod())
                         .contractPeriodUnitCode(product.getContractPeriodUnitCode())
