@@ -1,6 +1,7 @@
 package com.idolu.user.infrastructure.out.adapter;
 
 import com.idolu.user.domain.user.User;
+import com.idolu.user.global.exception.UserAlreadyExistException;
 import com.idolu.user.global.exception.UserNotFoundException;
 import com.idolu.user.infrastructure.out.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class UserAdapter {
     @Transactional(readOnly = true)
     public Mono<User> validateUserNotExists(String email) {
         return userRepository.findByEmail(email)
-                .flatMap(user -> Mono.error(new UserNotFoundException(USER_ALREADY_EXIST)));
+                .flatMap(user -> Mono.error(new UserAlreadyExistException(USER_ALREADY_EXIST)));
     }
 
     @Transactional(readOnly = true)
