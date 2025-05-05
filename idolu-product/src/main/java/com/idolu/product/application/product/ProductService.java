@@ -55,7 +55,7 @@ public class ProductService {
                         .build());
     }
 
-    public Mono<ProductDetailResponse> selectProductByProductId(Long productId) {
+    public Mono<ProductDetailResponse> getProductByProductId(Long productId) {
         return Mono.zip(productAdapter.findById(productId),
                         productImageAdapter.findByProductId(productId).collectList(),
                         productDiscountAdapter.findByProductId(productId).collectList())

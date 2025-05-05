@@ -39,8 +39,8 @@ public class ProductController {
     }
 
     @GetMapping("/products/{productId}")
-    public Mono<ApiResponse<ProductDetailResponse>> selectProductByProductId(@PathVariable Long productId) {
-        return productService.selectProductByProductId(productId)
+    public Mono<ApiResponse<ProductDetailResponse>> getProductByProductId(@PathVariable Long productId) {
+        return productService.getProductByProductId(productId)
                 .map(ApiResponse::ok);
     }
 
