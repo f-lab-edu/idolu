@@ -1,9 +1,7 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
-import com.idolu.product.application.product.command.ProductSearchCommand;
-import com.idolu.product.domain.category.Category;
+import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.domain.store.Store;
 import com.idolu.product.global.exception.ProductNotFoundException;
 import com.idolu.product.global.exception.ProductUpdateException;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
@@ -18,7 +16,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static com.idolu.product.domain.product.type.PeriodUnitCode.toPeriodUnitCode;
 import static com.idolu.product.domain.product.type.ProductStatus.toProductStatus;
@@ -46,7 +43,7 @@ public class ProductAdapter {
     }
 
     @Transactional(readOnly = true)
-    public Flux<ProductItemDto> getProductByCategoryAndStore(ProductSearchCommand productSearchCommand, Store store, Category category) {
+    public Flux<ProductItemDto> getProductByCategoryAndStore(GetProductsByCategoryAndStoreCommand productSearchCommand, Long storeId) {
         StringBuilder sqlBuilder = new StringBuilder("""
                             SELECT p.product_id,
                                 p.name,
@@ -77,8 +74,8 @@ public class ProductAdapter {
         sqlBuilder.append("LIMIT :limit");
 
         DatabaseClient.GenericExecuteSpec executeSpec = databaseClient.sql(sqlBuilder.toString())
-                .bind("storeId", store.getStoreId())
-                .bind("categoryId", category.getCategoryId())
+                .bind("storeId", storeId)
+                .bind("categoryId", productSearchCommand.getCategoryId())
                 .bind("limit", productSearchCommand.getItemCount());
 
         if (productSearchCommand.getLastProductId() != null) {

@@ -1,13 +1,12 @@
 package com.idolu.product.presentation.product.request;
 
-import com.idolu.product.application.product.command.ProductSearchCommand;
-import com.idolu.product.domain.product.type.SortType;
+import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductSearchRequest {
+public class GetProductsByCategoryAndStoreRequest {
 
     private String storeCode;
 
@@ -19,8 +18,8 @@ public class ProductSearchRequest {
 
     private Integer itemCount;
 
-    public ProductSearchCommand toCommand() {
-        return ProductSearchCommand.builder()
+    public GetProductsByCategoryAndStoreCommand toCommand() {
+        return GetProductsByCategoryAndStoreCommand.builder()
                 .storeCode(this.storeCode)
                 .categoryId(this.categoryId)
                 .sortType(this.sortType)

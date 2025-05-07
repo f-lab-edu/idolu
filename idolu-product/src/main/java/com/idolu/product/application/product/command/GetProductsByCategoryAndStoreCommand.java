@@ -7,7 +7,7 @@ import lombok.Getter;
 import static com.idolu.product.domain.product.type.SortType.toSortType;
 
 @Getter
-public class ProductSearchCommand {
+public class GetProductsByCategoryAndStoreCommand {
 
     private String storeCode;
 
@@ -20,7 +20,7 @@ public class ProductSearchCommand {
     private Integer itemCount;
 
     @Builder
-    public ProductSearchCommand(String storeCode, Long categoryId, String sortType, Long lastProductId, Integer itemCount) {
+    public GetProductsByCategoryAndStoreCommand(String storeCode, Long categoryId, String sortType, Long lastProductId, Integer itemCount) {
         this.storeCode = storeCode;
         this.categoryId = categoryId;
         this.sortType = toSortType(sortType);

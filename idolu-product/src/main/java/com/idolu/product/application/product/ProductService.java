@@ -1,7 +1,7 @@
 package com.idolu.product.application.product;
 
 import com.idolu.product.application.product.command.ProductCreateCommand;
-import com.idolu.product.application.product.command.ProductSearchCommand;
+import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.global.exception.ProductUpdateException;
@@ -39,10 +39,10 @@ public class ProductService {
      * 3. 카테고리 리스트에 대한 상품 정보 조회(최신순) 및 반환
      *   - 마지막 product_id 기준으로 20개 조회
      */
-    public Mono<ProductListResponse> getProductsByCategoryAndStore(ProductSearchCommand productSearchCommand) {
+    public Mono<ProductListResponse> getProductsByCategoryAndStore(GetProductsByCategoryAndStoreCommand productSearchCommand) {
         return storeAdapter.findByStoreCode(productSearchCommand.getStoreCode())
                 .zipWhen(store -> categoryAdapter.findByCategoryId(productSearchCommand.getCategoryId()))
-                .flatMapMany(TupleUtils.function((store, category) -> productAdapter.getProductByCategoryAndStore(productSearchCommand, store, category)))
+                .flatMapMany(TupleUtils.function((store, category) -> productAdapter.getProductByCategoryAndStore(productSearchCommand, store.getStoreId())))
                 .collectList()
                 .map(productItemDtos -> ProductListResponse.builder()
                         .products(productItemDtos)
