@@ -3,16 +3,16 @@ package com.idolu.user.global.exception;
 import lombok.Getter;
 
 @Getter
-public class BaseException extends RuntimeException {
+public class UserException extends RuntimeException {
 
-    private final ErrorCode errorCode;
+    private final ResponseCode errorCode;
 
-    public BaseException(ErrorCode code) {
+    public UserException(ResponseCode code) {
         super(code.getMessage());
         this.errorCode = code;
     }
 
-    public BaseException(ErrorCode code, String message) {
+    public UserException(ResponseCode code, String message) {
         super(message);
         this.errorCode = code;
     }
