@@ -1,6 +1,5 @@
 package com.idolu.product.application.product;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.idolu.product.application.product.command.ProductCreateCommand;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;

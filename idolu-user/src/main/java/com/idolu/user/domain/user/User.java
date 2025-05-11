@@ -1,6 +1,5 @@
 package com.idolu.user.domain.user;
 
-import com.idolu.user.domain.user.type.UserRole;
 import com.idolu.user.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +17,8 @@ public class User extends BaseEntity {
     @Id
     private Long userId;
 
+    private Long roleId;
+
     private String username;
 
     private String password;
@@ -26,26 +27,24 @@ public class User extends BaseEntity {
 
     private String phone;
 
-    private UserRole role;
-
     @PersistenceCreator
-    public User(Long userId, String username, String password, String email, String phone, UserRole role) {
+    public User(Long userId, Long roleId, String username, String password, String email, String phone) {
         this.userId = userId;
+        this.roleId = roleId;
         this.username = username;
         this.password = password;
         this.email = email;
         this.phone = phone;
-        this.role = role;
     }
 
     @Builder
-    public User(LocalDateTime createdAt, LocalDateTime updatedAt, Long userId, String username, String password, String email, String phone, UserRole role) {
+    public User(Long userId, Long roleId, String username, String password, String email, String phone, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
         this.phone = phone;
-        this.role = role;
+        this.roleId = roleId;
     }
 }

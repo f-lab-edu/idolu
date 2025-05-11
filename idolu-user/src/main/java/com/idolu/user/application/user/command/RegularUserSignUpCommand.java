@@ -1,6 +1,6 @@
 package com.idolu.user.application.user.command;
 
-import com.idolu.user.domain.user.type.UserRole;
+import com.idolu.user.domain.user.type.RoleType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ public class RegularUserSignUpCommand {
     private String password;
     private String email;
     private String phone;
-    private UserRole role;
+    private RoleType role;
 
     @Builder
     public RegularUserSignUpCommand(String username, String password, String email, String phone) {
@@ -19,6 +19,6 @@ public class RegularUserSignUpCommand {
         this.password = password;
         this.email = email;
         this.phone = phone;
-        this.role = UserRole.USER;
+        this.role = RoleType.CUSTOMER;
     }
 }
