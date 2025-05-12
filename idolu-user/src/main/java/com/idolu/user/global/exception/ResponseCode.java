@@ -11,6 +11,7 @@ public enum ResponseCode {
     INVALID_REQUEST("USER-0001", "잘못된 요청"),
     USER_NOT_FOUND("USER-0002", "유저 정보 미조회"),
     USER_ALREADY_EXIST("USER-0003", "중복된 사용자"),
+    ROLE_NOT_FOUND("USER-0004", "권한 정보 미조회"),
     SERVER_ERROR("USER-1999", "서버 오류")
     ;
 

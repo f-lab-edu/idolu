@@ -1,8 +1,11 @@
 package com.idolu.user.global.config;
 
+import com.idolu.user.application.user.AuthUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,9 +21,10 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthUserDetailsService customUserDetailsService;
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) throws Exception {
-
         httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
@@ -28,10 +32,21 @@ public class SecurityConfig {
 
         // 요청에 대한 인증
         httpSecurity.authorizeExchange(authz -> authz
-                .pathMatchers("/api/v1/user/signup").permitAll() // 회원가입
-                .anyExchange().authenticated());
+                        .pathMatchers(
+                                "/api/v1/auth/signup",
+                                "/api/v1/auth/login"
+                        ).permitAll() // 회원가입
+                        .anyExchange().authenticated());
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public ReactiveAuthenticationManager authenticationManager() {
+        UserDetailsRepositoryReactiveAuthenticationManager manager
+                = new UserDetailsRepositoryReactiveAuthenticationManager(customUserDetailsService);
+        manager.setPasswordEncoder(passwordEncoder());
+        return manager;
     }
 
     @Bean

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import java.util.Collection;
 
 @Getter
-public class AuthUser extends User {
+public class AuthenticatedUser extends User {
 
     private final Long userId;
     private final String username;
@@ -15,7 +15,7 @@ public class AuthUser extends User {
     private final String email;
     private final String phone;
 
-    public AuthUser(Long userId, String username, String password, String email, String phone, Collection<? extends GrantedAuthority> authorities) {
+    public AuthenticatedUser(Long userId, String username, String password, String email, String phone, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.userId = userId;
         this.username = username;
