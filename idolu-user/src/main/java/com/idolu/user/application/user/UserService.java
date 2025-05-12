@@ -8,7 +8,6 @@ import com.idolu.user.infrastructure.out.adapter.UserAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +18,9 @@ public class UserService {
     private final EncryptService encryptService;
 
     public Mono<Long> signUp(RegularUserSignUpCommand command) {
-        return Mono.zip(
-                        userAdapter.validateUserNotExists(command.getEmail()),
-                        roleAdapter.findRoleByName(command.getRole().name()))
-                .map(TupleUtils.function((user, role) -> toUserEntity(command, role)))
+        return userAdapter.validateUserNotExists(command.getEmail())
+                .then(roleAdapter.findRoleByName(command.getRole().name()))
+                .map(role -> toUserEntity(command, role))
                 .flatMap(userAdapter::saveUser)
                 .map(User::getUserId);
     }

@@ -27,18 +27,21 @@ public class User extends BaseEntity {
 
     private String phone;
 
+    private Boolean deleted;
+
     @PersistenceCreator
-    public User(Long userId, Long roleId, String username, String password, String email, String phone) {
+    public User(Long userId, Long roleId, String username, String password, String email, String phone, Boolean deleted) {
         this.userId = userId;
         this.roleId = roleId;
         this.username = username;
         this.password = password;
         this.email = email;
         this.phone = phone;
+        this.deleted = deleted;
     }
 
     @Builder
-    public User(Long userId, Long roleId, String username, String password, String email, String phone, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Long userId, Long roleId, String username, String password, String email, String phone, Boolean deleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
         this.userId = userId;
         this.username = username;
@@ -46,5 +49,6 @@ public class User extends BaseEntity {
         this.email = email;
         this.phone = phone;
         this.roleId = roleId;
+        this.deleted = deleted;
     }
 }
