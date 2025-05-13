@@ -1,4 +1,4 @@
-package com.idolu.user.infrastructure.out.persistence;
+package com.idolu.user.infrastructure.out.r2dbc.persistence;
 
 import com.idolu.user.domain.user.User;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;

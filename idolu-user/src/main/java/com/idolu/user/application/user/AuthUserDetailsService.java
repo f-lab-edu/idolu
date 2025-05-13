@@ -1,8 +1,8 @@
 package com.idolu.user.application.user;
 
 import com.idolu.user.domain.user.AuthenticatedUser;
-import com.idolu.user.infrastructure.out.adapter.RoleAdapter;
-import com.idolu.user.infrastructure.out.adapter.UserAdapter;
+import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
+import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;

@@ -6,8 +6,8 @@ import com.idolu.user.domain.user.AuthenticatedUser;
 import com.idolu.user.domain.user.Role;
 import com.idolu.user.domain.user.User;
 import com.idolu.user.global.utils.JwtTokenProvider;
-import com.idolu.user.infrastructure.out.adapter.RoleAdapter;
-import com.idolu.user.infrastructure.out.adapter.UserAdapter;
+import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
+import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
 import com.idolu.user.presentation.user.response.TokenDto;
 import com.idolu.user.presentation.user.response.UserSignInResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class UserService {
     private final EncryptService encryptService;
     private final ReactiveAuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     public Mono<Long> signUp(RegularUserSignUpCommand command) {
         return userAdapter.validateUserNotExists(command.getEmail())
@@ -50,6 +51,9 @@ public class UserService {
                     response.addCookie(refreshTokenCookie(tokenDto.getRefreshToken()));
                     return Tuples.of(authenticatedUser, tokenDto);
                 })
+                .flatMap(TupleUtils.function((authUser, tokenDto) ->
+                        tokenService.upsertToken(authUser.getEmail(), tokenDto.getRefreshToken())
+                                .then(Mono.just(Tuples.of(authUser, tokenDto)))))
                 .map(TupleUtils.function(UserSignInResponse::from));
 
     }

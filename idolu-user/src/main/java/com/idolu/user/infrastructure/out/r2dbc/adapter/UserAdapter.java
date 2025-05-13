@@ -1,8 +1,8 @@
-package com.idolu.user.infrastructure.out.adapter;
+package com.idolu.user.infrastructure.out.r2dbc.adapter;
 
 import com.idolu.user.domain.user.User;
 import com.idolu.user.global.exception.UserException;
-import com.idolu.user.infrastructure.out.persistence.UserRepository;
+import com.idolu.user.infrastructure.out.r2dbc.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
