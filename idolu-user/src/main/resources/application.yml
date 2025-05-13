@@ -12,6 +12,12 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_ROOT_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      database: ${REDIS_DATABASE}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 logging:
   level:
     org:

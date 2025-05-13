@@ -39,3 +39,4 @@ out/
 
 ### docker ###
 init-docker/mysql/volume/**
+init-docker/redis/**
