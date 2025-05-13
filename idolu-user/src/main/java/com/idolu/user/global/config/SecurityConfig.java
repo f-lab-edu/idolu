@@ -34,7 +34,7 @@ public class SecurityConfig {
         httpSecurity.authorizeExchange(authz -> authz
                         .pathMatchers(
                                 "/api/v1/auth/signup",
-                                "/api/v1/auth/login"
+                                "/api/v1/auth/signin"
                         ).permitAll() // 회원가입
                         .anyExchange().authenticated());
 
