@@ -17,6 +17,12 @@ public class RoleAdapter {
     private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
+    public Mono<Role> findRoleById(Long id) {
+        return roleRepository.findById(id)
+                .switchIfEmpty(Mono.error(new UserException(ROLE_NOT_FOUND)));
+    }
+
+    @Transactional(readOnly = true)
     public Mono<Role> findRoleByName(String name) {
         return roleRepository.findByName(name)
                 .switchIfEmpty(Mono.error(new UserException(ROLE_NOT_FOUND)));

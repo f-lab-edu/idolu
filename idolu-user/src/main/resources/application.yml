@@ -17,3 +17,9 @@ logging:
     org:
       springframework:
         r2dbc: DEBUG
+
+jwt:
+  secret: ${JWT_TOKEN}
+  expire:
+    access-token: 1
+    refresh-token: 24
