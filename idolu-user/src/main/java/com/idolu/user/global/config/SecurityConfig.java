@@ -43,10 +43,7 @@ public class SecurityConfig {
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // session STATELESS
                 .authorizeExchange(authz -> authz
-                        .pathMatchers(
-                                "/api/v1/auth/signup",
-                                "/api/v1/auth/signin"
-                        ).permitAll() // 회원가입
+                        .pathMatchers("/api/v1/auth/**").permitAll()
                         .anyExchange().authenticated())
                 .addFilterBefore(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 

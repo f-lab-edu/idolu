@@ -52,7 +52,7 @@ public class JwtTokenProvider {
         Object userId = claims.getPayload().get("userId");
 
         if (Objects.isNull(userId)) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+            throw new IllegalArgumentException("권한 정보가 없는 토큰입니다.");
         }
 
         return Long.valueOf(userId.toString());

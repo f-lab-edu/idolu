@@ -8,14 +8,18 @@ import com.idolu.user.domain.user.User;
 import com.idolu.user.global.authentication.JwtTokenProvider;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
+import com.idolu.user.presentation.user.response.ReIssueResponse;
 import com.idolu.user.presentation.user.response.TokenDto;
 import com.idolu.user.presentation.user.response.UserSignInResponse;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
@@ -56,6 +60,25 @@ public class UserService {
                                 .then(Mono.just(Tuples.of(authUser, tokenDto)))))
                 .map(TupleUtils.function(UserSignInResponse::from));
 
+    }
+
+    public Mono<ReIssueResponse> reissue(ServerHttpRequest request, ServerHttpResponse response) {
+        String accessToken = jwtTokenProvider.resolveToken(request);
+
+        if (!StringUtils.hasText(accessToken) || !jwtTokenProvider.validateToken(accessToken)) {
+            return Mono.error(new IllegalArgumentException("권한 정보가 없는 토큰입니다."));
+        }
+
+        return userAdapter.findUserBydId(jwtTokenProvider.getUserId(accessToken))
+                .map(user -> {
+                    TokenDto tokenDto = jwtTokenProvider.createNewToken(user.getUserId());
+                    response.addCookie(refreshTokenCookie(tokenDto.getRefreshToken()));
+                    return Tuples.of(user, tokenDto);
+                })
+                .flatMap(TupleUtils.function((user, tokenDto) ->
+                        tokenService.upsertToken(user.getEmail(), tokenDto.getRefreshToken())
+                                .then(Mono.just(Tuples.of(user, tokenDto)))))
+                .map(TupleUtils.function(ReIssueResponse::from));
     }
 
     private User toUserEntity(RegularUserSignUpCommand command, Role role) {
