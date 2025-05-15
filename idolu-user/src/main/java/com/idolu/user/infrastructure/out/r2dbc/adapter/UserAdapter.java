@@ -32,4 +32,9 @@ public class UserAdapter {
     public Mono<User> saveUser(User userEntity) {
         return userRepository.save(userEntity);
     }
+
+    @Transactional(readOnly = true)
+    public Mono<User> findUserBydId(Long userId) {
+        return userRepository.findById(userId);
+    }
 }

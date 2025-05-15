@@ -5,7 +5,7 @@ import com.idolu.user.application.user.command.UserSignInCommand;
 import com.idolu.user.domain.user.AuthenticatedUser;
 import com.idolu.user.domain.user.Role;
 import com.idolu.user.domain.user.User;
-import com.idolu.user.global.utils.JwtTokenProvider;
+import com.idolu.user.global.authentication.JwtTokenProvider;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
 import com.idolu.user.presentation.user.response.TokenDto;

@@ -1,42 +1,54 @@
 package com.idolu.user.global.config;
 
 import com.idolu.user.application.user.AuthUserDetailsService;
+import com.idolu.user.global.authentication.JwtAuthenticationManager;
+import com.idolu.user.global.authentication.JwtServerAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Collections;
 
+@Slf4j
 @Configuration
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final AuthUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationManager jwtAuthenticationManager;
+    private final JwtServerAuthenticationConverter jwtServerAuthenticationConverter;
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) throws Exception {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
+        AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(jwtAuthenticationManager);
+        authenticationWebFilter.setServerAuthenticationConverter(jwtServerAuthenticationConverter);
+
         httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable);
-
-        // 요청에 대한 인증
-        httpSecurity.authorizeExchange(authz -> authz
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // session STATELESS
+                .authorizeExchange(authz -> authz
                         .pathMatchers(
                                 "/api/v1/auth/signup",
                                 "/api/v1/auth/signin"
                         ).permitAll() // 회원가입
-                        .anyExchange().authenticated());
+                        .anyExchange().authenticated())
+                .addFilterBefore(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 
         return httpSecurity.build();
     }
