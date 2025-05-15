@@ -70,6 +70,8 @@ public class UserService {
         }
 
         return userAdapter.findUserBydId(jwtTokenProvider.getUserId(accessToken))
+                .flatMap(user -> tokenService.existsByRefreshToken(user.getEmail())
+                        .then(Mono.just(user)))
                 .map(user -> {
                     TokenDto tokenDto = jwtTokenProvider.createNewToken(user.getUserId());
                     response.addCookie(refreshTokenCookie(tokenDto.getRefreshToken()));

@@ -37,6 +37,12 @@ public class TokenService {
         return redisAdapter.setValue(key, refreshToken, refreshTokenExpireHour * 60 * 60);
     }
 
+    public Mono<Boolean> existsByRefreshToken(String email) {
+        return redisAdapter.getValue(email)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.")))
+                .then(Mono.just(true));
+    }
+
     public Mono<Authentication> getAuthentication(String accessToken) {
         return userAdapter.findUserBydId(jwtTokenProvider.getUserId(accessToken))
                 .zipWhen(user -> roleAdapter.findRoleById(user.getRoleId()))
