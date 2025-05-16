@@ -56,7 +56,7 @@ public class UserService {
                     return Tuples.of(authenticatedUser, tokenDto);
                 })
                 .flatMap(TupleUtils.function((authUser, tokenDto) ->
-                        tokenService.upsertToken(authUser.getEmail(), tokenDto.getRefreshToken())
+                        tokenService.upsertToken(authUser.getUserId(), tokenDto.getRefreshToken())
                                 .then(Mono.just(Tuples.of(authUser, tokenDto)))))
                 .map(TupleUtils.function(UserSignInResponse::from));
 
@@ -70,7 +70,7 @@ public class UserService {
         }
 
         return userAdapter.findUserBydId(jwtTokenProvider.getUserId(accessToken))
-                .flatMap(user -> tokenService.existsByRefreshToken(user.getEmail())
+                .flatMap(user -> tokenService.existsByRefreshToken(user.getUserId())
                         .then(Mono.just(user)))
                 .map(user -> {
                     TokenDto tokenDto = jwtTokenProvider.createNewToken(user.getUserId());
@@ -78,7 +78,7 @@ public class UserService {
                     return Tuples.of(user, tokenDto);
                 })
                 .flatMap(TupleUtils.function((user, tokenDto) ->
-                        tokenService.upsertToken(user.getEmail(), tokenDto.getRefreshToken())
+                        tokenService.upsertToken(user.getUserId(), tokenDto.getRefreshToken())
                                 .then(Mono.just(Tuples.of(user, tokenDto)))))
                 .map(TupleUtils.function(ReIssueResponse::from));
     }

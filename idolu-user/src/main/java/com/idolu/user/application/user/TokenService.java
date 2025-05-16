@@ -31,14 +31,14 @@ public class TokenService {
     private static final String BASE_KEY = "auth:";
 
 
-    public Mono<Boolean> upsertToken(String email, String refreshToken) {
-        String key = BASE_KEY + email;
+    public Mono<Boolean> upsertToken(Long userId, String refreshToken) {
+        String key = BASE_KEY + userId;
 
         return redisAdapter.setValue(key, refreshToken, refreshTokenExpireHour * 60 * 60);
     }
 
-    public Mono<Boolean> existsByRefreshToken(String email) {
-        return redisAdapter.getValue(email)
+    public Mono<Boolean> existsByRefreshToken(Long userId) {
+        return redisAdapter.getValue(BASE_KEY + userId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.")))
                 .then(Mono.just(true));
     }
