@@ -4,14 +4,14 @@ import com.idolu.product.domain.category.Category;
 import com.idolu.product.global.exception.ProductCreateValidationException;
 import com.idolu.product.infrastructure.out.persistence.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 import static com.idolu.product.global.exception.ErrorCode.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CategoryAdapter {
@@ -19,15 +19,8 @@ public class CategoryAdapter {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Mono<List<Category>> validateCategoriesExist(List<String> categoryCodes) {
-        return categoryRepository.findByCategoryCodeInAndDeleted(categoryCodes, false)
-                .collectList()
-                .flatMap(categories -> {
-                    if (categories.size() != categoryCodes.size()) {
-                        return Mono.error(new ProductCreateValidationException(PRODUCT_CATEGORIES_VALIDATION_FAILED));
-                    }
-
-                    return Mono.just(categories);
-                });
+    public Mono<Category> findByCategoryId(Long categoryId) {
+        return categoryRepository.findByCategoryIdAndDeleted(categoryId, false)
+                .switchIfEmpty(Mono.error(new ProductCreateValidationException(PRODUCT_CATEGORIES_VALIDATION_FAILED)));
     }
 }

@@ -1,7 +1,8 @@
 CREATE TABLE `product` (
     `product_id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT '상품 id',
     `product_identifier` varchar(50) UNIQUE COMMENT '상품 외부 id',
-    `store_id` varchar(30) COMMENT '회원사 id',
+    `store_id` bigint COMMENT '회원사 id',
+    `category_id` bigint COMMENT '카테고리 id',
     `stock` integer COMMENT '재고',
     `name` varchar(200) COMMENT '상품명',
     `product_status` varchar(50) COMMENT '상품 상태',
@@ -10,7 +11,6 @@ CREATE TABLE `product` (
     `basic_price` decimal(10,4) COMMENT '기본 가격',
     `selling_price` decimal(10,4) COMMENT '할인 가격',
     `discount_rate` int COMMENT '할인율',
-    `discount_one_time` boolean COMMENT '일회성 할인 여부',
     `contract_period` int COMMENT '계약 기간',
     `contract_period_unit_code` varchar(30) COMMENT '계약 기간 단위',
     `service_period` int COMMENT '서비스 제공주기',
@@ -45,17 +45,8 @@ CREATE TABLE `product_image` (
 
 CREATE TABLE `category` (
     `category_id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT '카테고리 id',
-    `category_code` varchar(30) COMMENT '카테고리 코드',
-    `category_name` varchar(100) COMMENT '카테고리명',
-    `deleted` boolean DEFAULT false COMMENT '삭제 여부',
-    `created_at` datetime COMMENT '생성 일시',
-    `updated_at` datetime COMMENT '최종 수정 일시'
-);
-
-CREATE TABLE `product_category` (
-    `product_category_id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT '상품 카테고리 id',
-    `product_id` bigint COMMENT '상품 id',
-    `category_id` bigint COMMENT '카테고리 id',
+    `group1` varchar(100) COMMENT '카테고리 1뎁스 명',
+    `group2` varchar(100) COMMENT '카테고리 2뎁스 명',
     `deleted` boolean DEFAULT false COMMENT '삭제 여부',
     `created_at` datetime COMMENT '생성 일시',
     `updated_at` datetime COMMENT '최종 수정 일시'
@@ -72,13 +63,4 @@ CREATE TABLE `store` (
     `deleted` boolean DEFAULT false COMMENT '삭제 여부',
     `created_at` datetime COMMENT '생성 일시',
     `updated_at` datetime COMMENT '최종 수정 일시'
-);
-
-CREATE TABLE `inventory_update_event` (
-    `inventory_update_event_id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT '재고 요청 관리 id',
-    `product_identifier` varchar(50) COMMENT '상품 외부 id',
-    `order_number` varchar(50) COMMENT '주문 외부 id',
-    `event_type` varchar(30) COMMENT '이벤트 타입',
-    `event_status` varchar(30) COMMENT '이벤트 상태',
-    `created_at` datetime COMMENT '생성 일시'
 );
