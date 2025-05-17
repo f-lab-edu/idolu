@@ -1,5 +1,6 @@
 package com.idolu.user.global.authentication;
 
+import com.idolu.user.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,7 @@ public class JwtServerAuthenticationConverter implements ServerAuthenticationCon
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        return Mono.justOrEmpty(jwtTokenProvider.resolveToken(exchange.getRequest()))
+        return Mono.justOrEmpty(jwtTokenProvider.resolveAccessToken(exchange.getRequest()))
                 .map(token -> new UsernamePasswordAuthenticationToken(token, token));
     }
 }

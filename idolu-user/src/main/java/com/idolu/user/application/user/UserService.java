@@ -1,17 +1,19 @@
 package com.idolu.user.application.user;
 
+import ch.qos.logback.core.spi.ErrorCodes;
 import com.idolu.user.application.user.command.RegularUserSignUpCommand;
 import com.idolu.user.application.user.command.UserSignInCommand;
 import com.idolu.user.domain.user.AuthenticatedUser;
 import com.idolu.user.domain.user.Role;
 import com.idolu.user.domain.user.User;
-import com.idolu.user.global.authentication.JwtTokenProvider;
+import com.idolu.user.global.exception.ResponseCode;
+import com.idolu.user.global.exception.UserException;
+import com.idolu.user.global.utils.JwtTokenProvider;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
 import com.idolu.user.presentation.user.response.ReIssueResponse;
 import com.idolu.user.presentation.user.response.TokenDto;
 import com.idolu.user.presentation.user.response.UserSignInResponse;
-import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -63,13 +65,13 @@ public class UserService {
     }
 
     public Mono<ReIssueResponse> reissue(ServerHttpRequest request, ServerHttpResponse response) {
-        String accessToken = jwtTokenProvider.resolveToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        if (!StringUtils.hasText(accessToken) || !jwtTokenProvider.validateToken(accessToken)) {
-            return Mono.error(new IllegalArgumentException("권한 정보가 없는 토큰입니다."));
+        if (!StringUtils.hasText(refreshToken) || !jwtTokenProvider.validateToken(refreshToken)) {
+            return Mono.error(new UserException(ResponseCode.INVALID_REFRESH_TOKEN));
         }
 
-        return userAdapter.findUserBydId(jwtTokenProvider.getUserId(accessToken))
+        return userAdapter.findUserBydId(jwtTokenProvider.getUserId(refreshToken))
                 .flatMap(user -> tokenService.existsByRefreshToken(user.getUserId())
                         .then(Mono.just(user)))
                 .map(user -> {

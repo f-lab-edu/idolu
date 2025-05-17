@@ -1,6 +1,8 @@
 package com.idolu.user.application.user;
 
-import com.idolu.user.global.authentication.JwtTokenProvider;
+import com.idolu.user.global.exception.ResponseCode;
+import com.idolu.user.global.exception.UserException;
+import com.idolu.user.global.utils.JwtTokenProvider;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.RoleAdapter;
 import com.idolu.user.infrastructure.out.r2dbc.adapter.UserAdapter;
 import com.idolu.user.infrastructure.out.redis.RedisAdapter;
@@ -30,7 +32,6 @@ public class TokenService {
 
     private static final String BASE_KEY = "auth:";
 
-
     public Mono<Boolean> upsertToken(Long userId, String refreshToken) {
         String key = BASE_KEY + userId;
 
@@ -39,7 +40,7 @@ public class TokenService {
 
     public Mono<Boolean> existsByRefreshToken(Long userId) {
         return redisAdapter.getValue(BASE_KEY + userId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.")))
+                .switchIfEmpty(Mono.error(new UserException(ResponseCode.INVALID_REFRESH_TOKEN)))
                 .then(Mono.just(true));
     }
 

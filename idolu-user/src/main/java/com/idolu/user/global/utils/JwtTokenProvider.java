@@ -1,4 +1,4 @@
-package com.idolu.user.global.authentication;
+package com.idolu.user.global.utils;
 
 import com.idolu.user.presentation.user.response.TokenDto;
 import io.jsonwebtoken.*;
@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -33,7 +35,7 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
-    public String resolveToken(ServerHttpRequest request) {
+    public String resolveAccessToken(ServerHttpRequest request) {
         String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         if (!StringUtils.isBlank(bearerToken) && bearerToken.startsWith("Bearer")) {
@@ -41,6 +43,12 @@ public class JwtTokenProvider {
         }
 
         return null;
+    }
+
+    public String resolveRefreshToken(ServerHttpRequest request) {
+        return Optional.ofNullable(request.getCookies().getFirst("refreshToken"))
+                .map(HttpCookie::getValue)
+                .orElse(null);
     }
 
     public Long getUserId(String accessToken) {

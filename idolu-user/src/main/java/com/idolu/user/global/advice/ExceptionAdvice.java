@@ -34,7 +34,7 @@ public class ExceptionAdvice {
 
     @ExceptionHandler(UserException.class)
     protected Mono<ApiResponse<DetailErrorCodeResponse>> userException(UserException exception) {
-        log.warn("UserAlreadyExistException: {}", exception.getMessage());
+        log.warn("UserException: {}", exception.getMessage());
         return Mono.just(ApiResponse.error(exception.getErrorCode()));
     }
 }

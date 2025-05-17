@@ -1,12 +1,14 @@
 package com.idolu.user.global.config;
 
 import com.idolu.user.application.user.AuthUserDetailsService;
+import com.idolu.user.global.authentication.JwtAuthenticationFailureHandler;
 import com.idolu.user.global.authentication.JwtAuthenticationManager;
 import com.idolu.user.global.authentication.JwtServerAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -19,6 +21,7 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
@@ -31,11 +34,13 @@ public class SecurityConfig {
     private final AuthUserDetailsService customUserDetailsService;
     private final JwtAuthenticationManager jwtAuthenticationManager;
     private final JwtServerAuthenticationConverter jwtServerAuthenticationConverter;
+    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
         AuthenticationWebFilter authenticationWebFilter = new AuthenticationWebFilter(jwtAuthenticationManager);
         authenticationWebFilter.setServerAuthenticationConverter(jwtServerAuthenticationConverter);
+        authenticationWebFilter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler);
 
         httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
