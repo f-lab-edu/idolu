@@ -1,2 +1,4 @@
 rootProject.name = 'idolu'
-include("idolu-product")
+
+include('idolu-product')
+include('idolu-user')

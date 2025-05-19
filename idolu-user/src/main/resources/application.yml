@@ -1,0 +1,31 @@
+spring:
+  profiles:
+    active: local
+---
+server:
+  port: 10020
+spring:
+  config:
+    activate:
+      on-profile: local
+  r2dbc:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      database: ${REDIS_DATABASE}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
+
+jwt:
+  secret: ${JWT_TOKEN}
+  expire:
+    access-token: 1
+    refresh-token: 24
