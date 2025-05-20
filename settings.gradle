@@ -2,3 +2,4 @@ rootProject.name = 'idolu'
 
 include('idolu-product')
 include('idolu-user')
+include('idolu-order')
