@@ -95,6 +95,12 @@ public class UserService {
                 .map(TupleUtils.function(ReIssueResponse::from));
     }
 
+    public Mono<Long> validateAccessToken(ServerHttpRequest request) {
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+
+        return Mono.just(jwtTokenProvider.getUserId(accessToken));
+    }
+
     private Mono<Boolean> upsertToken(Long userId, String refreshToken) {
         String key = BASE_KEY + userId;
 
