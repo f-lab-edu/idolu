@@ -1,9 +1,9 @@
-package com.idolu.idoluorder.infrastructure.web;
+package com.idolu.idoluorder.infrastructure.out.web;
 
 import com.idolu.idoluorder.global.common.ApiResponse;
 import com.idolu.idoluorder.global.common.OrderException;
 import com.idolu.idoluorder.global.common.ResponseCode;
-import com.idolu.idoluorder.infrastructure.web.response.ProductDetailResponse;
+import com.idolu.idoluorder.infrastructure.out.web.response.ProductDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;

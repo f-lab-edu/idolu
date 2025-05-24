@@ -1,4 +1,4 @@
-package com.idolu.idoluorder.infrastructure.web.response;
+package com.idolu.idoluorder.infrastructure.out.web.response;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.idolu.idoluorder.infrastructure.web;
+package com.idolu.idoluorder.infrastructure.out.web;
 
 import com.idolu.idoluorder.global.common.ApiResponse;
 import com.idolu.idoluorder.global.common.OrderException;
