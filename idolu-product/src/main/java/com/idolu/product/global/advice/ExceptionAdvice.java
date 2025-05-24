@@ -1,11 +1,13 @@
 package com.idolu.product.global.advice;
 
+import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductImage;
 import com.idolu.product.global.common.ApiResponse;
 import com.idolu.product.global.common.DetailErrorCodeResponse;
 import com.idolu.product.global.exception.ProductCreateValidationException;
 
 import com.idolu.product.global.exception.ProductImageNotFoundException;
+import com.idolu.product.global.exception.ProductNotFoundException;
 import com.idolu.product.global.exception.ProductUpdateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -63,6 +65,17 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Mono<ApiResponse<DetailErrorCodeResponse>> productImageNotFoundException(ProductImageNotFoundException exception) {
         log.warn("ProductImageNotFoundException: {}", exception.getMessage());
+        return Mono.just(ApiResponse.of(
+                exception.getErrorCode().getStatus(),
+                null,
+                DetailErrorCodeResponse.from(exception.getErrorCode().getDetailCode())
+        ));
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected Mono<ApiResponse<DetailErrorCodeResponse>> productNotFoundException(ProductNotFoundException exception) {
+        log.warn("ProductNotFoundException: {}", exception.getMessage());
         return Mono.just(ApiResponse.of(
                 exception.getErrorCode().getStatus(),
                 null,
