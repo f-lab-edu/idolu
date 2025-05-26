@@ -1,5 +1,6 @@
 package com.idolu.idoluorder.domain.order;
 
+import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,9 +19,9 @@ public class OrderHistory {
 
     private Long orderId;
 
-    private String previousStatus;
+    private OrderStatus previousStatus;
 
-    private String newStatus;
+    private OrderStatus newStatus;
 
     private String reason;
 
@@ -29,7 +30,7 @@ public class OrderHistory {
 
     @Builder
     @PersistenceCreator
-    public OrderHistory(Long orderHistoriesId, Long orderId, String previousStatus, String newStatus, String reason, LocalDateTime createdAt) {
+    public OrderHistory(Long orderHistoriesId, Long orderId, OrderStatus previousStatus, OrderStatus newStatus, String reason, LocalDateTime createdAt) {
         this.orderHistoriesId = orderHistoriesId;
         this.orderId = orderId;
         this.previousStatus = previousStatus;
