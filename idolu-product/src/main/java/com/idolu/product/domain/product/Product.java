@@ -3,6 +3,7 @@ package com.idolu.product.domain.product;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.type.PeriodUnitCode;
 import com.idolu.product.domain.product.type.ProductStatus;
+import com.idolu.product.domain.product.type.StockType;
 import com.idolu.product.global.common.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.*;
@@ -131,5 +132,14 @@ public class Product extends BaseEntity {
                         .toList())
                 .productInformation(command.getProductInformation())
                 .build();
+    }
+
+    public Product updateStock(Integer stock, StockType stockType) {
+        switch (stockType) {
+            case INCREASE -> this.stock += stock;
+            case DECREASE -> this.stock -= stock;
+        }
+
+        return this;
     }
 }

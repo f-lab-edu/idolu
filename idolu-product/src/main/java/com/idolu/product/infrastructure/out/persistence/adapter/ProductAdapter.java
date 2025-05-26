@@ -119,6 +119,11 @@ public class ProductAdapter {
                 .flatMap(this::saveNewProductRelations);
     }
 
+    @Transactional
+    public Mono<Product> updateStock(Product product) {
+        return productRepository.save(product);
+    }
+
     private Mono<Product> deleteOldProductRelations(Product product) {
         return Mono.when(
                 productDiscountAdapter.setDeletedByProductId(product.getProductId()),
