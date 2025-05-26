@@ -15,6 +15,10 @@ dependencies {
     // r2dbc
     runtimeOnly 'io.asyncer:r2dbc-mysql'
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.47.0'
 }
 
 tasks.named('test') {
