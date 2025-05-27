@@ -1,7 +1,7 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.domain.product.ProductImage;
-import com.idolu.product.global.exception.ProductImageNotFoundException;
+import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
-import static com.idolu.product.global.exception.ErrorCode.PRODUCT_IMAGE_NOT_FOUND;
+import static com.idolu.product.global.common.ResponseCode.PRODUCT_IMAGE_NOT_FOUND;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class ProductImageAdapter {
     @Transactional(readOnly = true)
     public Flux<ProductImage> findByProductId(Long productId) {
         return productImageRepository.findByProductId(productId)
-                .switchIfEmpty(Mono.error(new ProductImageNotFoundException(PRODUCT_IMAGE_NOT_FOUND, PRODUCT_IMAGE_NOT_FOUND.getMessage().formatted(productId))));
+                .switchIfEmpty(Mono.error(new ProductException(PRODUCT_IMAGE_NOT_FOUND)));
     }
 
     public Mono<Void> saveProductImage(ProductImage productImage) {

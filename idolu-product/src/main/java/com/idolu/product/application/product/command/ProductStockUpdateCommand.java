@@ -14,9 +14,9 @@ public class ProductStockUpdateCommand {
     private StockType stockType;
 
     @Builder
-    public ProductStockUpdateCommand(Long productId, Integer stock, String orderStatus) {
+    public ProductStockUpdateCommand(Long productId, Integer stock, String stockType) {
         this.productId = productId;
         this.stock = stock;
-        this.stockType = toStockType(orderStatus);
+        this.stockType = toStockType(stockType);
     }
 }

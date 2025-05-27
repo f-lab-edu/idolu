@@ -9,8 +9,7 @@ import com.idolu.product.domain.product.ProductDiscount;
 import com.idolu.product.domain.product.ProductImage;
 import com.idolu.product.domain.product.type.ImageType;
 import com.idolu.product.global.annotation.DistributedLock;
-import com.idolu.product.global.exception.BaseException;
-import com.idolu.product.global.exception.ProductUpdateException;
+import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.adapter.*;
 import com.idolu.product.presentation.product.response.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import reactor.function.TupleUtils;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.idolu.product.global.exception.ErrorCode.*;
+import static com.idolu.product.global.common.ResponseCode.*;
 
 @Service
 @Slf4j
@@ -79,7 +78,7 @@ public class ProductService {
         return productAdapter.findById(command.getProductId())
                 .flatMap(product -> {
                     if (!product.getUpdatedAt().isEqual(command.getUpdatedAt())) {
-                        return Mono.error(new ProductUpdateException(PRODUCT_INVALID_UPDATED_TIME, PRODUCT_INVALID_UPDATED_TIME.getMessage().formatted(product.getProductId())));
+                        return Mono.error(new ProductException(PRODUCT_INVALID_UPDATED_TIME));
                     }
 
                     return Mono.just(product.changeInfo(command));
@@ -91,16 +90,17 @@ public class ProductService {
     }
 
     @DistributedLock(lockName = "productStock", identifier = "productId", paramClassType = ProductStockUpdateCommand.class)
-    public Mono<Product> updateProductStock(ProductStockUpdateCommand command) {
+    public Mono<Boolean> updateProductStock(ProductStockUpdateCommand command) {
         return productAdapter.findById(command.getProductId())
                 .flatMap(product -> {
                     Product updatedProduct = product.updateStock(command.getStock(), command.getStockType());
                     if (updatedProduct.getStock() < 0) {
-                        return Mono.error(new BaseException(PRODUCT_INSUFFICIENT_STOCK));
+                        return Mono.error(new ProductException(PRODUCT_INSUFFICIENT_STOCK));
                     }
 
                     return productAdapter.updateStock(updatedProduct);
-                });
+                })
+                .thenReturn(true);
     }
 
     private ProductDetailResponse generateProductDetailResponse(Product product, List<ProductImage> productImages, List<ProductDiscount> productDiscounts) {

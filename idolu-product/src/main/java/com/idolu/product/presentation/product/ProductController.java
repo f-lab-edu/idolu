@@ -30,7 +30,7 @@ public class ProductController {
     public Mono<ApiResponse<ProductCreateResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         return productService.createProduct(request.toCommand())
                 .doOnNext(id -> log.info("id {} Product 생성", id))
-                .map(id -> ApiResponse.of(HttpStatus.CREATED, ProductCreateResponse.from(id)));
+                .map(id -> ApiResponse.ok(ProductCreateResponse.from(id)));
     }
 
     @GetMapping("/products")
@@ -53,8 +53,8 @@ public class ProductController {
     }
 
     @PostMapping("/products/stocks")
-    public Mono<ApiResponse<Void>> updateProductStock(@RequestBody ProductStockUpdateRequest request) {
+    public Mono<ApiResponse<Boolean>> updateProductStock(@RequestBody ProductStockUpdateRequest request) {
         return productService.updateProductStock(request.toCommand())
-                .map(data -> ApiResponse.ok(null));
+                .map(ApiResponse::ok);
     }
 }

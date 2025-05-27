@@ -2,8 +2,7 @@ package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.global.exception.ProductNotFoundException;
-import com.idolu.product.global.exception.ProductUpdateException;
+import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.ProductItemDto;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import java.math.BigDecimal;
 
 import static com.idolu.product.domain.product.type.PeriodUnitCode.toPeriodUnitCode;
 import static com.idolu.product.domain.product.type.ProductStatus.toProductStatus;
-import static com.idolu.product.global.exception.ErrorCode.*;
+import static com.idolu.product.global.common.ResponseCode.*;
 
 @Component
 @Slf4j
@@ -102,7 +101,7 @@ public class ProductAdapter {
     @Transactional(readOnly = true)
     public Mono<Product> findById(Long productId) {
         return productRepository.findByProductIdAndDeleted(productId, false)
-                .switchIfEmpty(Mono.error(new ProductNotFoundException(PRODUCT_NOT_FOUND, PRODUCT_NOT_FOUND.getMessage().formatted(productId))));
+                .switchIfEmpty(Mono.error(new ProductException(PRODUCT_NOT_FOUND)));
     }
 
     @Transactional
@@ -110,7 +109,7 @@ public class ProductAdapter {
         return productRepository.save(product)
                 .onErrorMap(e -> {
                     if (e instanceof OptimisticLockingFailureException) {
-                        return new ProductUpdateException(PRODUCT_DUPLICATED_REQUEST, PRODUCT_DUPLICATED_REQUEST.getMessage().formatted(product.getProductId()));
+                        return new ProductException(PRODUCT_DUPLICATED_REQUEST);
                     }
 
                     return e; // 다른 예외는 그대로 전달

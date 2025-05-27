@@ -1,7 +1,7 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.global.exception.ProductNotFoundException;
+import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static com.idolu.product.global.exception.ErrorCode.*;
+import static com.idolu.product.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -48,8 +48,8 @@ class ProductAdapterTest {
         StepVerifier.create(productAdapter.findById(product.getProductId()))
                 .verifyErrorSatisfies(e -> {
                     assertThat(e)
-                            .isInstanceOf(ProductNotFoundException.class)
-                            .hasMessage(PRODUCT_NOT_FOUND.getMessage().formatted(1L));
+                            .isInstanceOf(ProductException.class)
+                            .hasMessage(PRODUCT_NOT_FOUND.getMessage());
                 });
     }
 }

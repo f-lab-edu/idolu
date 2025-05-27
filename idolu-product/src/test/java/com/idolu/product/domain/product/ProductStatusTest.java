@@ -1,8 +1,7 @@
 package com.idolu.product.domain.product;
 
 import com.idolu.product.domain.product.type.ProductStatus;
-import com.idolu.product.global.exception.BaseException;
-import com.idolu.product.global.exception.ProductCreateValidationException;
+import com.idolu.product.global.common.ProductException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.stream.Stream;
 
 import static com.idolu.product.domain.product.type.ProductStatus.*;
-import static com.idolu.product.global.exception.ErrorCode.PRODUCT_STATUS_VALIDATION_FAILED;
+import static com.idolu.product.global.common.ResponseCode.PRODUCT_STATUS_VALIDATION_FAILED;
 import static org.assertj.core.api.Assertions.*;
 
 class ProductStatusTest {
@@ -28,7 +27,7 @@ class ProductStatusTest {
     @ValueSource(strings = {"OFF_SALE", "COM_SOON", "SOLD_OUT", "TERMINATED"})
     void 상품_초기_상태가_아니라면_예외가_발생한다(String input) {
         assertThatThrownBy(() -> validateInitialState(input))
-                .isInstanceOf(ProductCreateValidationException.class)
+                .isInstanceOf(ProductException.class)
                 .hasMessage(PRODUCT_STATUS_VALIDATION_FAILED.getMessage());
     }
 
@@ -44,7 +43,7 @@ class ProductStatusTest {
     @ValueSource(strings = {"OFF_SALE", "COM_SOON", "SOLF_OUT", "TERMINATE"})
     void 상품_상태값이_존재하지_않으면_예외를_반환한다(String input) {
         assertThatThrownBy(() -> toProductStatus(input))
-                .isInstanceOf(BaseException.class)
+                .isInstanceOf(ProductException.class)
                 .hasMessage("타입을 찾을 수 없습니다. ProductStatus: %s".formatted(input));
     }
 
