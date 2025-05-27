@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.stream.Stream;
 
 import static com.idolu.product.domain.product.type.ProductStatus.*;
-import static com.idolu.product.global.exception.ErrorCode.ENUM_VALIDATE_FAILED;
 import static com.idolu.product.global.exception.ErrorCode.PRODUCT_STATUS_VALIDATION_FAILED;
 import static org.assertj.core.api.Assertions.*;
 
@@ -46,7 +45,7 @@ class ProductStatusTest {
     void 상품_상태값이_존재하지_않으면_예외를_반환한다(String input) {
         assertThatThrownBy(() -> toProductStatus(input))
                 .isInstanceOf(BaseException.class)
-                .hasMessage(ENUM_VALIDATE_FAILED.getMessage().formatted(input));
+                .hasMessage("타입을 찾을 수 없습니다. ProductStatus: %s".formatted(input));
     }
 
     private static Stream<Arguments> provideInvalidState() {
