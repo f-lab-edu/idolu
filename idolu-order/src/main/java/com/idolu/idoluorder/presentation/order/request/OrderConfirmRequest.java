@@ -11,6 +11,7 @@ public class OrderConfirmRequest {
     private String paymentKey;
     private Long orderId;
     private Long productId;
+    private Integer quantity;
     private BigDecimal amount;
 
     public OrderConfirmCommand toCommand() {
@@ -18,6 +19,7 @@ public class OrderConfirmRequest {
                 .paymentKey(this.paymentKey)
                 .orderId(this.orderId)
                 .productId(this.productId)
+                .quantity(this.quantity)
                 .amount(this.amount)
                 .build();
     }

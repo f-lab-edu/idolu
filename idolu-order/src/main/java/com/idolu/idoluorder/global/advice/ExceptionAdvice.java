@@ -1,9 +1,6 @@
 package com.idolu.idoluorder.global.advice;
 
-import com.idolu.idoluorder.global.common.ApiResponse;
-import com.idolu.idoluorder.global.common.DetailErrorCodeResponse;
-import com.idolu.idoluorder.global.common.OrderException;
-import com.idolu.idoluorder.global.common.ResponseCode;
+import com.idolu.idoluorder.global.common.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,8 +30,14 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(OrderException.class)
-    protected Mono<ApiResponse<DetailErrorCodeResponse>> userException(OrderException exception) {
+    protected Mono<ApiResponse<Void>> orderException(OrderException exception) {
         log.warn("OrderException: {}", exception.getMessage());
         return Mono.just(ApiResponse.error(exception.getErrorCode()));
+    }
+
+    @ExceptionHandler(ProductRequestException.class)
+    protected Mono<ApiResponse<Void>> productRequestException(ProductRequestException exception) {
+        log.warn("ProductRequestException: {}", exception.getResponse());
+        return Mono.just(ApiResponse.error(exception.getCode(), exception.getResponse()));
     }
 }

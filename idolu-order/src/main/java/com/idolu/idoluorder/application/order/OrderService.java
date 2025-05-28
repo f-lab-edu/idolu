@@ -1,11 +1,13 @@
 package com.idolu.idoluorder.application.order;
 
 import com.idolu.idoluorder.application.order.command.CheckoutCommand;
+import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.ProductAdapter;
+import com.idolu.idoluorder.infrastructure.out.web.request.ProductStockUpdateRequest;
 import com.idolu.idoluorder.infrastructure.out.web.UserAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.response.ProductDetailResponse;
 import com.idolu.idoluorder.presentation.order.response.CheckoutResponse;
@@ -38,6 +40,19 @@ public class OrderService {
                         .orderNo(order.getOrderNo())
                         .amount(order.getOrderItem().getAmount())
                         .build());
+    }
+
+    public Mono<Order> confirm(OrderConfirmCommand command, String authorization) {
+        return userAdapter.validateAccessToken(authorization)
+                .flatMap(userId -> orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderId(), command.getPaymentKey()))
+                .filterWhen(order -> orderAdapter.validateOrder(command))
+                .filterWhen(order -> {
+                    return productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
+                            .productId(command.getProductId())
+                            .stock(command.getQuantity())
+                            .stockType("DECREASE")
+                            .build());
+                });
     }
 
     private OrderItem createOrderItem(ProductDetailResponse product, CheckoutCommand command) {

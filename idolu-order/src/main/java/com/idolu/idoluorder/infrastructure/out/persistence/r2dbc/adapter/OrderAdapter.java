@@ -1,5 +1,6 @@
 package com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter;
 
+import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderHistory;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
@@ -35,6 +36,17 @@ public class OrderAdapter {
         return checkPaymentOrderStatus(orderId)
                 .flatMap(order -> insertPaymentHistory(order, EXECUTING, "CONFIRMATION_START").thenReturn(order))
                 .flatMap(order -> updateOrderStatusAndPaymentKey(order, paymentKey));
+    }
+
+    @Transactional(readOnly = true)
+    public Mono<Boolean> validateOrder(OrderConfirmCommand command) {
+        return orderItemRepository.findByOrderId(command.getOrderId())
+                .filter(orderItem ->
+                        orderItem.getAmount().equals(command.getAmount()) &&
+                        orderItem.getQuantity().equals(command.getQuantity()) &&
+                        orderItem.getProductId().equals(command.getProductId()))
+                .switchIfEmpty(Mono.error(new OrderException(INVALID_ORDER_REQUEST)))
+                .thenReturn(true);
     }
 
     private Mono<Order> updateOrderStatusAndPaymentKey(Order order, String paymentKey) {

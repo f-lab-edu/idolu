@@ -14,6 +14,12 @@ public class ApiResponse<T> {
     private String message;
     private T data;
 
+    public ApiResponse(String code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
+
     public ApiResponse(ResponseCode code, T data) {
         this.code = code.getDetailCode();
         this.message = code.getMessage();
@@ -30,5 +36,9 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> error(ResponseCode code) {
         return of(code, null);
+    }
+
+    public static <T> ApiResponse<T> error(String code, String messgae) {
+        return new ApiResponse<>(code, messgae, null);
     }
 }
