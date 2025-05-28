@@ -2,6 +2,7 @@ package com.idolu.product.global.advice;
 
 import com.idolu.product.global.common.ApiResponse;
 
+import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.global.common.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +24,12 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Mono<ApiResponse<String>> illegalArgumentException(IllegalArgumentException exception) {
         log.warn("IllegalArgumentException: {}", exception.getMessage());
         return Mono.just(ApiResponse.error(ResponseCode.INVALID_REQUEST)) ;
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected Mono<ApiResponse<String>> bindException(WebExchangeBindException exception) {
         log.warn("WebExchangeBindException: {}", exception.getMessage());
         return Mono.just(ApiResponse.error(ResponseCode.INVALID_REQUEST));
@@ -39,6 +38,13 @@ public class ExceptionAdvice {
     @ExceptionHandler(ProductException.class)
     protected Mono<ApiResponse<Void>> productException(ProductException exception) {
         log.warn("ProductException: {}", exception.getMessage());
+        return Mono.just(ApiResponse.error(exception.getErrorCode()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ProductBadRequestException.class)
+    protected Mono<ApiResponse<Void>> productBadRequestException(ProductBadRequestException exception) {
+        log.warn("ProductBadRequestException: {}", exception.getMessage());
         return Mono.just(ApiResponse.error(exception.getErrorCode()));
     }
 }

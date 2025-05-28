@@ -2,6 +2,7 @@ package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.domain.product.Product;
+import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.ProductItemDto;
@@ -101,7 +102,7 @@ public class ProductAdapter {
     @Transactional(readOnly = true)
     public Mono<Product> findById(Long productId) {
         return productRepository.findByProductIdAndDeleted(productId, false)
-                .switchIfEmpty(Mono.error(new ProductException(PRODUCT_NOT_FOUND)));
+                .switchIfEmpty(Mono.error(new ProductBadRequestException(PRODUCT_NOT_FOUND)));
     }
 
     @Transactional

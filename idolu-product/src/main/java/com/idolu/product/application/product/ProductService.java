@@ -9,6 +9,7 @@ import com.idolu.product.domain.product.ProductDiscount;
 import com.idolu.product.domain.product.ProductImage;
 import com.idolu.product.domain.product.type.ImageType;
 import com.idolu.product.global.annotation.DistributedLock;
+import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.adapter.*;
 import com.idolu.product.presentation.product.response.*;
@@ -95,7 +96,7 @@ public class ProductService {
                 .flatMap(product -> {
                     Product updatedProduct = product.updateStock(command.getStock(), command.getStockType());
                     if (updatedProduct.getStock() < 0) {
-                        return Mono.error(new ProductException(PRODUCT_INSUFFICIENT_STOCK));
+                        return Mono.error(new ProductBadRequestException(PRODUCT_INSUFFICIENT_STOCK));
                     }
 
                     return productAdapter.updateStock(updatedProduct);
