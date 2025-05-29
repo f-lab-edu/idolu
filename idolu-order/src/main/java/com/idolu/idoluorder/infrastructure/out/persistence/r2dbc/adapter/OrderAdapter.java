@@ -72,7 +72,11 @@ public class OrderAdapter {
     }
 
     private Mono<Boolean> updatePaymentStatusToFailure(PaymentStatusUpdateCommand command) {
-        return null;
+        return orderRepository.findByOrderNo(command.getOrderNo())
+                .flatMap(order ->
+                        insertPaymentHistory(order, command.getOrderStatus(), command.getPaymentFailure().getMessage()).thenReturn(order))
+                .flatMap(order -> updateOrder(order.changeStatus(command.getOrderStatus())))
+                .thenReturn(true);
     }
 
     private Mono<Boolean> updatePaymentStatusToUnknown(PaymentStatusUpdateCommand command) {
