@@ -47,17 +47,6 @@ public class Order extends BaseEntity {
     @Transient
     private OrderItem orderItem;
 
-    public Order withOrderItem(OrderItem orderItems) {
-        this.orderItem = orderItems;
-        return this;
-    }
-
-    public Order toExecutingWithPaymentKey(String paymentKey) {
-        this.orderStatus = EXECUTING;
-        this.paymentKey = paymentKey;
-        return this;
-    }
-
     @Builder
     @PersistenceCreator
     public Order(Long orderId, Long buyerId, String orderNo, String recipient, String phone,
@@ -77,5 +66,21 @@ public class Order extends BaseEntity {
         this.failedCount = failedCount;
         this.threshold = threshold;
         this.approvedAt = approvedAt;
+    }
+
+    public Order withOrderItem(OrderItem orderItems) {
+        this.orderItem = orderItems;
+        return this;
+    }
+
+    public Order toExecutingWithPaymentKey(String paymentKey) {
+        this.orderStatus = EXECUTING;
+        this.paymentKey = paymentKey;
+        return this;
+    }
+
+    public Order changeStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+        return this;
     }
 }

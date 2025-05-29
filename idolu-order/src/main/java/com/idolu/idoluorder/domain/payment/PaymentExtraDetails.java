@@ -1,6 +1,6 @@
 package com.idolu.idoluorder.domain.payment;
 
-import com.idolu.idoluorder.domain.payment.type.PSPConfirmationStatus;
+import com.idolu.idoluorder.domain.payment.type.PaymentStatus;
 import com.idolu.idoluorder.domain.payment.type.PaymentMethod;
 import com.idolu.idoluorder.domain.payment.type.PaymentType;
 import lombok.Builder;
@@ -17,7 +17,7 @@ public class PaymentExtraDetails {
     private PaymentMethod method;
     private LocalDateTime approvedAt;
     private String orderName;
-    private PSPConfirmationStatus pspConfirmationStatus;
+    private PaymentStatus paymentStatus;
     private BigDecimal totalAmount;
     private BigDecimal balanceAmount;
     private String pspRawData;

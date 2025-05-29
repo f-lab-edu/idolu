@@ -2,10 +2,13 @@ package com.idolu.idoluorder.application.order;
 
 import com.idolu.idoluorder.application.order.command.CheckoutCommand;
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
+import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
+import com.idolu.idoluorder.domain.payment.PaymentExecutionResult;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
+import com.idolu.idoluorder.infrastructure.out.web.PaymentExecutorAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.ProductAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.request.ProductStockUpdateRequest;
 import com.idolu.idoluorder.infrastructure.out.web.UserAdapter;
@@ -28,6 +31,7 @@ public class OrderService {
     private final UserAdapter userAdapter;
     private final ProductAdapter productAdapter;
     private final OrderAdapter orderAdapter;
+    private final PaymentExecutorAdapter paymentExecutorAdapter;
 
     public Mono<CheckoutResponse> checkout(CheckoutCommand command, String authorization) {
         return Mono.zip(
@@ -42,17 +46,25 @@ public class OrderService {
                         .build());
     }
 
-    public Mono<Order> confirm(OrderConfirmCommand command, String authorization) {
+    public Mono<PaymentExecutionResult> confirm(OrderConfirmCommand command, String authorization) {
         return userAdapter.validateAccessToken(authorization)
-                .flatMap(userId -> orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderId(), command.getPaymentKey()))
-                .filterWhen(order -> orderAdapter.validateOrder(command))
-                .filterWhen(order -> {
-                    return productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
-                            .productId(command.getProductId())
-                            .stock(command.getQuantity())
-                            .stockType("DECREASE")
-                            .build());
-                });
+                .flatMap(userId -> orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderNo(), command.getPaymentKey()))
+                .filterWhen(order -> orderAdapter.validateOrder(order, command))
+                .filterWhen(order -> productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
+                        .productId(command.getProductId())
+                        .stock(command.getQuantity())
+                        .stockType("DECREASE")
+                        .build()))
+                .flatMap(order -> paymentExecutorAdapter.execute(command))
+                .flatMap(paymentExecutionResult ->
+                        orderAdapter.updatePaymentStatus(PaymentStatusUpdateCommand.builder()
+                                        .paymentKey(paymentExecutionResult.getPaymentKey())
+                                        .orderNo(paymentExecutionResult.getOrderNo())
+                                        .orderStatus(paymentExecutionResult.toOrderStatus())
+                                        .extraDetails(paymentExecutionResult.getExtraDetails())
+                                        .paymentFailure(paymentExecutionResult.getFailure())
+                                        .build())
+                                .thenReturn(paymentExecutionResult));
     }
 
     private OrderItem createOrderItem(ProductDetailResponse product, CheckoutCommand command) {

@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.idolu.idoluorder.domain.payment.type.PSPConfirmationStatus.*;
+import static com.idolu.idoluorder.domain.payment.type.PaymentStatus.*;
 import static com.idolu.idoluorder.domain.payment.type.PaymentMethod.toPaymentMethod;
 import static com.idolu.idoluorder.domain.payment.type.PaymentType.*;
 import static com.idolu.idoluorder.infrastructure.out.web.response.TossPaymentError.*;
@@ -51,7 +51,7 @@ public class PaymentExecutorAdapter {
                                 .method(toPaymentMethod(response.getMethod()))
                                 .approvedAt(LocalDateTime.parse(response.getApprovedAt(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)) // yyyy-MM-dd'T'HH:mm:ss±hh:mm ISO 8601 형식
                                 .orderName(response.getOrderName())
-                                .pspConfirmationStatus(toPSPConfirmationStatus(response.getStatus()))
+                                .pspConfirmationStatus(toPaymentStatus(response.getStatus()))
                                 .totalAmount(response.getTotalAmount())
                                 .balanceAmount(response.getBalanceAmount())
                                 .build())

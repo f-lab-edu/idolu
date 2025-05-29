@@ -1,5 +1,7 @@
-package com.idolu.idoluorder.domain.order;
+package com.idolu.idoluorder.domain.payment;
 
+import com.idolu.idoluorder.domain.payment.type.PaymentMethod;
+import com.idolu.idoluorder.domain.payment.type.PaymentStatus;
 import com.idolu.idoluorder.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,15 +20,15 @@ public class PaymentEvent extends BaseEntity {
     private Long paymentEventId;
     private Long orderId;
     private String paymentKey;
-    private String method;
-    private String paymentStatus;
+    private PaymentMethod method;
+    private PaymentStatus paymentStatus;
     private BigDecimal totalAmount;
     private BigDecimal balanceAmount;
     private BigDecimal canceledAmount;
 
     @Builder
     @PersistenceCreator
-    public PaymentEvent(Long paymentEventId, Long orderId, String paymentKey, String method, String paymentStatus,
+    public PaymentEvent(Long paymentEventId, Long orderId, String paymentKey, PaymentMethod method, PaymentStatus paymentStatus,
                         BigDecimal totalAmount, BigDecimal balanceAmount, BigDecimal canceledAmount,
                         LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
