@@ -1,6 +1,5 @@
 package com.idolu.idoluorder.infrastructure.out.web;
 
-import com.idolu.idoluorder.global.common.OrderException;
 import com.idolu.idoluorder.global.common.ProductRequestException;
 import com.idolu.idoluorder.infrastructure.out.web.request.ProductStockUpdateRequest;
 import com.idolu.idoluorder.infrastructure.out.web.response.ProductApiResponse;
@@ -37,12 +36,12 @@ public class ProductAdapter {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, this::createProductRequestException)
+                .onStatus(statusCode -> statusCode.is4xxClientError() || statusCode.is5xxServerError(), this::createProductRequestException)
                 .bodyToMono(new ParameterizedTypeReference<ProductApiResponse<Boolean>>() {})
                 .map(ProductApiResponse::getData);
     }
 
-    private Mono<OrderException> createProductRequestException(ClientResponse clientResponse) {
+    private Mono<ProductRequestException> createProductRequestException(ClientResponse clientResponse) {
         return clientResponse.bodyToMono(new ParameterizedTypeReference<ProductApiResponse<Void>>() {})
                 .flatMap(data -> Mono.error(new ProductRequestException(data.getCode(), data.getMessage())));
     }

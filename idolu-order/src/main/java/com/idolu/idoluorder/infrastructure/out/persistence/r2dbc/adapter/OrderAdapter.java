@@ -32,15 +32,15 @@ public class OrderAdapter {
     }
 
     @Transactional
-    public Mono<Order> updatePaymentPaymentStatusToExecuting(Long orderId, String paymentKey) {
-        return checkPaymentOrderStatus(orderId)
+    public Mono<Order> updatePaymentPaymentStatusToExecuting(String orderNo, String paymentKey) {
+        return checkPaymentOrderStatus(orderNo)
                 .flatMap(order -> insertPaymentHistory(order, EXECUTING, "CONFIRMATION_START").thenReturn(order))
                 .flatMap(order -> updateOrderStatusAndPaymentKey(order, paymentKey));
     }
 
     @Transactional(readOnly = true)
-    public Mono<Boolean> validateOrder(OrderConfirmCommand command) {
-        return orderItemRepository.findByOrderId(command.getOrderId())
+    public Mono<Boolean> validateOrder(Order order, OrderConfirmCommand command) {
+        return orderItemRepository.findByOrderId(order.getOrderId())
                 .filter(orderItem ->
                         orderItem.getAmount().equals(command.getAmount()) &&
                         orderItem.getQuantity().equals(command.getQuantity()) &&
@@ -62,8 +62,8 @@ public class OrderAdapter {
                 .build());
     }
 
-    private Mono<Order> checkPaymentOrderStatus(Long orderId) {
-        return orderRepository.findById(orderId)
+    private Mono<Order> checkPaymentOrderStatus(String orderNo) {
+        return orderRepository.findByOrderNo(orderNo)
                 .switchIfEmpty(Mono.error(new OrderException(ORDER_NOT_FOUND)))
                 .handle((order, sink) -> {
                     switch (order.getOrderStatus()) {

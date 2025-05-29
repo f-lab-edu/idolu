@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class OrderConfirmRequest {
 
     private String paymentKey;
-    private Long orderId;
+    private String orderNo;
     private Long productId;
     private Integer quantity;
     private BigDecimal amount;
@@ -17,7 +17,7 @@ public class OrderConfirmRequest {
     public OrderConfirmCommand toCommand() {
         return OrderConfirmCommand.builder()
                 .paymentKey(this.paymentKey)
-                .orderId(this.orderId)
+                .orderNo(this.orderNo)
                 .productId(this.productId)
                 .quantity(this.quantity)
                 .amount(this.amount)
