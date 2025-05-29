@@ -83,4 +83,9 @@ public class Order extends BaseEntity {
         this.orderStatus = orderStatus;
         return this;
     }
+
+    public Order increaseFailCount() {
+        this.failedCount += 1;
+        return this;
+    }
 }
