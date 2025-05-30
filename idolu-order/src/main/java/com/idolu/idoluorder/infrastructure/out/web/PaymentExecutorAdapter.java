@@ -51,7 +51,7 @@ public class PaymentExecutorAdapter {
                                 .method(toPaymentMethod(response.getMethod()))
                                 .approvedAt(LocalDateTime.parse(response.getApprovedAt(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)) // yyyy-MM-dd'T'HH:mm:ss±hh:mm ISO 8601 형식
                                 .orderName(response.getOrderName())
-                                .pspConfirmationStatus(toPaymentStatus(response.getStatus()))
+                                .paymentStatus(toPaymentStatus(response.getStatus()))
                                 .totalAmount(response.getTotalAmount())
                                 .balanceAmount(response.getBalanceAmount())
                                 .build())
