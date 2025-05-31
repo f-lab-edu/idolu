@@ -8,7 +8,7 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum PaymentMethod {
-    EASY_PAY("간편결제");
+    ONETOUCH_PAY("간편결제");
 
     private final String method;
 
