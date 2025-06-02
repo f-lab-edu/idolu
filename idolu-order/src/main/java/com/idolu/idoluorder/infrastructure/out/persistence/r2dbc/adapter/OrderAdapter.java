@@ -4,6 +4,7 @@ import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
 import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderHistory;
+import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.payment.PaymentEvent;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import com.idolu.idoluorder.global.common.OrderException;
@@ -45,10 +46,16 @@ public class OrderAdapter {
     @Transactional(readOnly = true)
     public Mono<Boolean> validateOrder(Order order, OrderConfirmCommand command) {
         return orderItemRepository.findByOrderId(order.getOrderId())
-                .filter(orderItem ->
-                        orderItem.getAmount().equals(command.getAmount()) &&
-                                orderItem.getQuantity().equals(command.getQuantity()) &&
-                                orderItem.getProductId().equals(command.getProductId()))
+                .collectList()
+                .filter(orderItems -> {
+                    OrderItem matchedItem = orderItems.stream()
+                            .filter(orderItem -> orderItem.getProductId().equals(command.getProductId()))
+                            .findFirst()
+                            .orElseThrow(() -> new OrderException(INVALID_ORDER_REQUEST));
+
+                    return matchedItem.getAmount().equals(command.getAmount()) &&
+                            matchedItem.getQuantity().equals(command.getQuantity());
+                })
                 .switchIfEmpty(Mono.error(new OrderException(INVALID_ORDER_REQUEST)))
                 .thenReturn(true);
     }
@@ -59,7 +66,8 @@ public class OrderAdapter {
             case SUCCESS -> updatePaymentStatusToSuccess(command);
             case FAILURE -> updatePaymentStatusToFailure(command);
             case UNKNWOKN -> updatePaymentStatusToUnknown(command);
-            default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
+            default ->
+                    Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
         };
     }
 
