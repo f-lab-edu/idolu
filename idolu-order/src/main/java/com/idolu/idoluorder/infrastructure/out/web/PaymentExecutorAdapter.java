@@ -2,6 +2,9 @@ package com.idolu.idoluorder.infrastructure.out.web;
 
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
 import com.idolu.idoluorder.domain.payment.PaymentExtraDetails;
+import com.idolu.idoluorder.domain.payment.type.PaymentMethod;
+import com.idolu.idoluorder.domain.payment.type.PaymentStatus;
+import com.idolu.idoluorder.domain.payment.type.PaymentType;
 import com.idolu.idoluorder.global.common.PaymentRequestException;
 import com.idolu.idoluorder.infrastructure.out.web.request.PaymentExecutionRequest;
 import com.idolu.idoluorder.domain.payment.PaymentExecutionResult;
@@ -19,9 +22,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.idolu.idoluorder.domain.payment.type.PaymentStatus.*;
-import static com.idolu.idoluorder.domain.payment.type.PaymentMethod.toPaymentMethod;
-import static com.idolu.idoluorder.domain.payment.type.PaymentType.*;
 import static com.idolu.idoluorder.infrastructure.out.web.response.TossPaymentError.*;
 
 @Slf4j
@@ -51,11 +51,11 @@ public class PaymentExecutorAdapter {
                         .isUnknown(false)
                         .isRetryable(false)
                         .extraDetails(PaymentExtraDetails.builder()
-                                .type(toPaymentType(response.getType()))
-                                .method(toPaymentMethod(response.getMethod()))
+                                .type(PaymentType.from(response.getType()))
+                                .method(PaymentMethod.from(response.getMethod()))
                                 .approvedAt(LocalDateTime.parse(response.getApprovedAt(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)) // yyyy-MM-dd'T'HH:mm:ss±hh:mm ISO 8601 형식
                                 .orderName(response.getOrderName())
-                                .paymentStatus(toPaymentStatus(response.getStatus()))
+                                .paymentStatus(PaymentStatus.from(response.getStatus()))
                                 .totalAmount(response.getTotalAmount())
                                 .balanceAmount(response.getBalanceAmount())
                                 .build())

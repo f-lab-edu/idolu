@@ -12,7 +12,7 @@ public enum PaymentType {
 
     private final String description;
 
-    public static PaymentType toPaymentType(String type) {
+    public static PaymentType from(String type) {
         return Arrays.stream(PaymentType.values())
                 .filter(paymentType -> paymentType.name().equals(type))
                 .findFirst()

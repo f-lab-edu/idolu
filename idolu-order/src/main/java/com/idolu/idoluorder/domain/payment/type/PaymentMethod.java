@@ -12,7 +12,7 @@ public enum PaymentMethod {
 
     private final String method;
 
-    public static PaymentMethod toPaymentMethod(String method) {
+    public static PaymentMethod from(String method) {
         return Arrays.stream(PaymentMethod.values())
                 .filter(paymentMethod -> paymentMethod.name().equals(method))
                 .findFirst()

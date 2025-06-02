@@ -20,7 +20,7 @@ public enum PaymentStatus {
 
     public final String description;
 
-    public static PaymentStatus toPaymentStatus(String status) {
+    public static PaymentStatus from(String status) {
         return Arrays.stream(PaymentStatus.values())
                 .filter(confirmationStatus -> confirmationStatus.name().equals(status))
                 .findFirst()
