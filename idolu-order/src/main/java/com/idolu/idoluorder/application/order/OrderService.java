@@ -22,6 +22,7 @@ import reactor.function.TupleUtils;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -75,7 +76,9 @@ public class OrderService {
                 .sellingPrice(product.getPrice().getSellingPrice())
                 .discountRate(product.getPrice().getDiscountRate())
                 .quantity(command.getQuantity())
-                .amount(product.getPrice().getSellingPrice().multiply(BigDecimal.valueOf(command.getQuantity())))
+                .amount(IntStream.range(0, command.getQuantity())
+                        .mapToObj(i -> product.getPrice().getSellingPrice())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .build();
     }
 
