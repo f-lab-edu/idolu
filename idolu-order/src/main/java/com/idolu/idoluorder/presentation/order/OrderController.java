@@ -8,7 +8,6 @@ import com.idolu.idoluorder.presentation.order.request.OrderConfirmRequest;
 import com.idolu.idoluorder.presentation.order.response.CheckoutResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -21,19 +20,18 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/checkout")
-    public Mono<ApiResponse<CheckoutResponse>> checkout(
-            @RequestBody CheckoutRequest request,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    public Mono<ApiResponse<CheckoutResponse>> checkout(@RequestBody CheckoutRequest request) {
 
-        return orderService.checkout(request.toCommand(), authorization)
-                .map(ApiResponse::ok);
+        return Mono.deferContextual(ctx -> {
+            Long userId = ctx.get("userId");
+            return orderService.checkout(request.toCommand(userId));
+        }).map(ApiResponse::ok);
     }
 
     @PostMapping("/confirm")
     public Mono<PaymentExecutionResult> confirm(
-            @RequestBody OrderConfirmRequest request,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+            @RequestBody OrderConfirmRequest request) {
 
-        return orderService.confirm(request.toCommand(), authorization);
+        return orderService.confirm(request.toCommand());
     }
 }

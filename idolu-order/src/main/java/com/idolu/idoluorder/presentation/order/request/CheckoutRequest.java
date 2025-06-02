@@ -20,8 +20,9 @@ public class CheckoutRequest {
 
     private String detailAddress;
 
-    public CheckoutCommand toCommand() {
+    public CheckoutCommand toCommand(Long userId) {
         return CheckoutCommand.builder()
+                .userId(userId)
                 .productId(this.productId)
                 .quantity(this.quantity)
                 .recipient(this.recipient)

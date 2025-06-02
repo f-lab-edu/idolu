@@ -7,6 +7,8 @@ import lombok.Getter;
 @Getter
 public class CheckoutCommand {
 
+    private Long userId;
+
     private Long productId;
 
     private Integer quantity;
@@ -22,7 +24,8 @@ public class CheckoutCommand {
     private String detailAddress;
 
     @Builder
-    public CheckoutCommand(Long productId, Integer quantity, String recipient, String phone, String zipCode, String baseAddress, String detailAddress) {
+    public CheckoutCommand(Long userId, Long productId, Integer quantity, String recipient, String phone, String zipCode, String baseAddress, String detailAddress) {
+        this.userId = userId;
         this.productId = productId;
         this.quantity = quantity;
         this.recipient = recipient;

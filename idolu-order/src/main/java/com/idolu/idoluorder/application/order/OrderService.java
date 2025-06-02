@@ -11,14 +11,12 @@ import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAd
 import com.idolu.idoluorder.infrastructure.out.web.PaymentExecutorAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.ProductAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.request.ProductStockUpdateRequest;
-import com.idolu.idoluorder.infrastructure.out.web.UserAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.response.ProductDetailResponse;
 import com.idolu.idoluorder.presentation.order.response.CheckoutResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -29,17 +27,14 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final UserAdapter userAdapter;
     private final ProductAdapter productAdapter;
     private final OrderAdapter orderAdapter;
     private final PaymentExecutorAdapter paymentExecutorAdapter;
 
-    public Mono<CheckoutResponse> checkout(CheckoutCommand command, String authorization) {
-        return Mono.zip(
-                        userAdapter.validateAccessToken(authorization),
-                        productAdapter.getProductInformation(command.getProductId()))
-                .flatMap(TupleUtils.function((userId, product) ->
-                        orderAdapter.checkoutOrder(createOrder(userId, command).withOrderItem(createOrderItem(product, command)))))
+    public Mono<CheckoutResponse> checkout(CheckoutCommand command) {
+        return productAdapter.getProductInformation(command.getProductId())
+                .flatMap( product ->
+                        orderAdapter.checkoutOrder(createOrder(command).withOrderItem(createOrderItem(product, command))))
                 .map(order -> CheckoutResponse.builder()
                         .orderId(order.getOrderId())
                         .orderNo(order.getOrderNo())
@@ -47,9 +42,8 @@ public class OrderService {
                         .build());
     }
 
-    public Mono<PaymentExecutionResult> confirm(OrderConfirmCommand command, String authorization) {
-        return userAdapter.validateAccessToken(authorization)
-                .flatMap(userId -> orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderNo(), command.getPaymentKey()))
+    public Mono<PaymentExecutionResult> confirm(OrderConfirmCommand command) {
+        return orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderNo(), command.getPaymentKey())
                 .filterWhen(order -> orderAdapter.validateOrder(order, command))
                 .filterWhen(order -> productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
                         .productId(command.getProductId())
@@ -82,9 +76,9 @@ public class OrderService {
                 .build();
     }
 
-    private Order createOrder(Long userId, CheckoutCommand command) {
+    private Order createOrder(CheckoutCommand command) {
         return Order.builder()
-                .buyerId(userId)
+                .buyerId(command.getUserId())
                 .orderNo(UUID.randomUUID().toString())
                 .recipient(command.getRecipient())
                 .phone(command.getPhone())
