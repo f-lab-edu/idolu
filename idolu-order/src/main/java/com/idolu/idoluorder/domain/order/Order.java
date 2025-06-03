@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-import static com.idolu.idoluorder.domain.order.type.OrderStatus.EXECUTING;
+import static com.idolu.idoluorder.domain.order.type.OrderStatus.CONFIRM_EXECUTING;
 
 @Getter
 @Table(name = "orders")
@@ -74,7 +74,7 @@ public class Order extends BaseEntity {
     }
 
     public Order toExecutingWithPaymentKey(String paymentKey) {
-        this.orderStatus = EXECUTING;
+        this.orderStatus = CONFIRM_EXECUTING;
         this.paymentKey = paymentKey;
         return this;
     }

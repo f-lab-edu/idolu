@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
-import static com.idolu.idoluorder.domain.order.type.OrderStatus.EXECUTING;
+import static com.idolu.idoluorder.domain.order.type.OrderStatus.CONFIRM_EXECUTING;
 import static com.idolu.idoluorder.global.common.ResponseCode.*;
 
 @Component
@@ -39,7 +39,7 @@ public class OrderAdapter {
     @Transactional
     public Mono<Order> updatePaymentPaymentStatusToExecuting(String orderNo, String paymentKey) {
         return checkPaymentOrderStatus(orderNo)
-                .flatMap(order -> insertPaymentHistory(order, EXECUTING, "CONFIRMATION_START").thenReturn(order))
+                .flatMap(order -> insertPaymentHistory(order, CONFIRM_EXECUTING, "CONFIRMATION_START").thenReturn(order))
                 .flatMap(order -> updateOrderStatusAndPaymentKey(order, paymentKey));
     }
 
@@ -63,11 +63,10 @@ public class OrderAdapter {
     @Transactional
     public Mono<Boolean> updatePaymentStatus(PaymentStatusUpdateCommand command) {
         return switch (command.getOrderStatus()) {
-            case SUCCESS -> updatePaymentStatusToSuccess(command);
-            case FAILURE -> updatePaymentStatusToFailure(command);
-            case UNKNWOKN -> updatePaymentStatusToUnknown(command);
-            default ->
-                    Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
+            case CONFIRM_SUCCESS -> updatePaymentStatusToSuccess(command);
+            case CONFIRM_FAILURE -> updatePaymentStatusToFailure(command);
+            case CONFIRM_UNKNOWN -> updatePaymentStatusToUnknown(command);
+            default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
         };
     }
 
@@ -132,9 +131,9 @@ public class OrderAdapter {
                 .switchIfEmpty(Mono.error(new OrderException(ORDER_NOT_FOUND)))
                 .handle((order, sink) -> {
                     switch (order.getOrderStatus()) {
-                        case NOT_STARTED, UNKNWOKN, EXECUTING -> sink.next(order);
-                        case SUCCESS -> sink.error(new OrderException(ALREADY_SUCCESS_ORDER));
-                        case FAILURE -> sink.error(new OrderException(ALREADY_FAILURE_ORDER));
+                        case NOT_STARTED, CONFIRM_UNKNOWN, CONFIRM_EXECUTING -> sink.next(order);
+                        case CONFIRM_SUCCESS -> sink.error(new OrderException(ALREADY_SUCCESS_ORDER));
+                        case CONFIRM_FAILURE -> sink.error(new OrderException(ALREADY_FAILURE_ORDER));
                     }
                 });
     }
