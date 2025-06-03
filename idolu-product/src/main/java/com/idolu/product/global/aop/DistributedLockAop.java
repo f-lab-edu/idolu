@@ -51,16 +51,22 @@ public class DistributedLockAop {
                 })
                 .flatMap(lockAcquired -> {
                     try {
-                        return aopForTransaction.proceed(joinPoint)
-                                .flatMap(result -> {
-                                    log.info("락 해제 시도 threadId: {}", threadId);
-                                    return redissonClient.getLock(baseKey + ":" + dynamicKey)
-                                            .unlock(threadId)
-                                            .thenReturn(result);
-                                });
+                        return aopForTransaction.proceed(joinPoint);
                     } catch (Throwable e) {
                         return Mono.error(e);
                     }
+                })
+                .flatMap(result -> {
+                    log.info("락 해제 시도 threadId: {}", threadId);
+                    return redissonClient.getLock(baseKey + ":" + dynamicKey)
+                            .unlock(threadId)
+                            .thenReturn(result);
+                })
+                .onErrorResume(ex -> {
+                    log.info("락 해제 시도 threadId: {}", threadId);
+                    return redissonClient.getLock(baseKey + ":" + dynamicKey)
+                            .unlock(threadId)
+                            .then(Mono.error(ex)); // 예외 다시 전달
                 });
     }
 }
