@@ -6,6 +6,7 @@ import com.idolu.idoluorder.global.common.ApiResponse;
 import com.idolu.idoluorder.presentation.order.request.CheckoutRequest;
 import com.idolu.idoluorder.presentation.order.request.OrderConfirmRequest;
 import com.idolu.idoluorder.presentation.order.response.CheckoutResponse;
+import com.idolu.idoluorder.presentation.order.response.OrderConfirmationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class OrderController {
     }
 
     @PostMapping("/confirm")
-    public Mono<PaymentExecutionResult> confirm(
+    public Mono<OrderConfirmationResponse> confirm(
             @RequestBody OrderConfirmRequest request) {
 
         return orderService.confirm(request.toCommand());
