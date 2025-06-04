@@ -7,6 +7,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -16,6 +17,7 @@ import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import javax.net.ssl.SSLException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -32,25 +34,37 @@ public class WebClientConfig {
     @Value("${external.toss.url}")
     private String tossServiceUrl;
 
+    @Value("${external.toss.secretKey}")
+    private String tossSecretKey;
+
     @Bean
     public WebClient userWebClient() throws SSLException {
-        return createWebClient("userWebClient", userServiceUrl);
+        return createDefaultWebClient("userWebClient", userServiceUrl);
     }
 
     @Bean
     public WebClient productWebClient() throws SSLException {
-        return createWebClient("productWebClient", productServiceUrl);
+        return createDefaultWebClient("productWebClient", productServiceUrl);
     }
     @Bean
     public WebClient tossWebClient() throws SSLException {
-        return createWebClient("tossWebClient", tossServiceUrl);
+        String encodedSecretKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+        return WebClient.builder()
+                .baseUrl(tossServiceUrl)
+                .defaultHeaders(httpHeaders -> httpHeaders.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedSecretKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .clientConnector(new ReactorClientHttpConnector(createHttpClient("tossWebClient")))
+                .build();
     }
 
 
-    private WebClient createWebClient(String name, String baseUrl) throws SSLException {
+    private WebClient createDefaultWebClient(String name, String baseUrl) throws SSLException {
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeaders(httpHeaders -> httpHeaders.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .clientConnector(new ReactorClientHttpConnector(createHttpClient(name)))
                 .build();
     }

@@ -14,7 +14,7 @@ public enum PaymentMethod {
 
     public static PaymentMethod from(String method) {
         return Arrays.stream(PaymentMethod.values())
-                .filter(paymentMethod -> paymentMethod.name().equals(method))
+                .filter(paymentMethod -> paymentMethod.getMethod().equals(method))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("타입을 찾을 수 없습니다. PaymentMethod: %s".formatted(method)));
     }
