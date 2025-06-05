@@ -90,12 +90,8 @@ public class OrderAdapter {
         return orderRepository.findByOrderNo(command.getOrderNo())
                 .flatMap(order ->
                         insertPaymentHistory(order, command.getOrderStatus(), command.getPaymentFailure().getMessage()).thenReturn(order))
-                .flatMap(order -> updateUnknownOrder(order.changeStatus(command.getOrderStatus())))
+                .flatMap(order -> updateOrder(order.changeStatus(command.getOrderStatus()).increaseFailCount()))
                 .thenReturn(true);
-    }
-
-    private Mono<Order> updateUnknownOrder(Order order) {
-        return orderRepository.save(order.increaseFailCount());
     }
 
     private Mono<PaymentEvent> savePaymentEvent(PaymentStatusUpdateCommand command, Order order) {
