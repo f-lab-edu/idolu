@@ -1,7 +1,6 @@
 package com.idolu.idoluorder.presentation.order;
 
 import com.idolu.idoluorder.application.order.OrderService;
-import com.idolu.idoluorder.domain.payment.PaymentExecutionResult;
 import com.idolu.idoluorder.global.common.ApiResponse;
 import com.idolu.idoluorder.presentation.order.request.CheckoutRequest;
 import com.idolu.idoluorder.presentation.order.request.OrderConfirmRequest;

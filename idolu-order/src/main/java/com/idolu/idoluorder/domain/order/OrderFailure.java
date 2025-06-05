@@ -1,4 +1,4 @@
-package com.idolu.idoluorder.presentation.order.response;
+package com.idolu.idoluorder.domain.order;
 
 import lombok.Builder;
 import lombok.Getter;

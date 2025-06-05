@@ -1,16 +1,15 @@
 package com.idolu.idoluorder.application.order;
 
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
-import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
+import com.idolu.idoluorder.application.order.command.OrderStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
-import com.idolu.idoluorder.domain.payment.PaymentFailure;
 import com.idolu.idoluorder.global.common.OrderException;
 import com.idolu.idoluorder.global.common.PaymentRequestException;
 import com.idolu.idoluorder.global.common.ProductRequestException;
 import com.idolu.idoluorder.global.common.ResponseCode;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
 import com.idolu.idoluorder.presentation.order.response.OrderConfirmationResponse;
-import com.idolu.idoluorder.presentation.order.response.OrderFailure;
+import com.idolu.idoluorder.domain.order.OrderFailure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -72,14 +71,11 @@ public class OrderFailureService {
                     .build();
         }
 
-        return orderAdapter.updatePaymentStatus(PaymentStatusUpdateCommand.builder()
+        return orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
                         .paymentKey(command.getPaymentKey())
                         .orderNo(command.getOrderNo())
                         .orderStatus(orderStatus)
-                        .paymentFailure(PaymentFailure.builder()
-                                .errorCode(orderFailure.getErrorCode())
-                                .message(orderFailure.getMessage())
-                                .build())
+                        .orderFailure(orderFailure)
                         .build())
                 .map(result -> OrderConfirmationResponse.builder()
                         .status(orderStatus)

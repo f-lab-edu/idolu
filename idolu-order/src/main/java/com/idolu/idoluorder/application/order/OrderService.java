@@ -2,8 +2,9 @@ package com.idolu.idoluorder.application.order;
 
 import com.idolu.idoluorder.application.order.command.CheckoutCommand;
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
-import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
+import com.idolu.idoluorder.application.order.command.OrderStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
+import com.idolu.idoluorder.domain.order.OrderFailure;
 import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
@@ -53,12 +54,15 @@ public class OrderService {
                         .build()))
                 .flatMap(order -> paymentExecutorAdapter.execute(command))
                 .flatMap(paymentExecutionResult ->
-                        orderAdapter.updatePaymentStatus(PaymentStatusUpdateCommand.builder()
+                        orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
                                         .paymentKey(paymentExecutionResult.getPaymentKey())
                                         .orderNo(paymentExecutionResult.getOrderNo())
                                         .orderStatus(paymentExecutionResult.toOrderStatus())
                                         .extraDetails(paymentExecutionResult.getExtraDetails())
-                                        .paymentFailure(paymentExecutionResult.getFailure())
+                                        .orderFailure(OrderFailure.builder()
+                                                .errorCode(paymentExecutionResult.getFailure().getErrorCode())
+                                                .message(paymentExecutionResult.getFailure().getMessage())
+                                                .build())
                                         .build())
                                 .thenReturn(paymentExecutionResult))
                 .map(paymentExecutionResult -> OrderConfirmationResponse.builder()
