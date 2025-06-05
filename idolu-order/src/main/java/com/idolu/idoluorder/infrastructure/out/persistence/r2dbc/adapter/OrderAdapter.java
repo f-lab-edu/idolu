@@ -1,7 +1,7 @@
 package com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter;
 
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
-import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
+import com.idolu.idoluorder.application.order.command.OrderStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderHistory;
 import com.idolu.idoluorder.domain.order.OrderItem;
@@ -61,16 +61,16 @@ public class OrderAdapter {
     }
 
     @Transactional
-    public Mono<Boolean> updatePaymentStatus(PaymentStatusUpdateCommand command) {
+    public Mono<Boolean> updateOrderStatus(OrderStatusUpdateCommand command) {
         return switch (command.getOrderStatus()) {
-            case CONFIRM_SUCCESS -> updatePaymentStatusToSuccess(command);
-            case CONFIRM_FAILURE -> updatePaymentStatusToFailure(command);
-            case CONFIRM_UNKNOWN -> updatePaymentStatusToUnknown(command);
+            case CONFIRM_SUCCESS -> updateOrderStatusToSuccess(command);
+            case CONFIRM_FAILURE -> updateOrderStatusToFailure(command);
+            case CONFIRM_UNKNOWN -> updateOrderStatusToUnknown(command);
             default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
         };
     }
 
-    private Mono<Boolean> updatePaymentStatusToSuccess(PaymentStatusUpdateCommand command) {
+    private Mono<Boolean> updateOrderStatusToSuccess(OrderStatusUpdateCommand command) {
         return orderRepository.findByOrderNo(command.getOrderNo())
                 .flatMap(order -> insertPaymentHistory(order, command.getOrderStatus(), "CONFIRMATION_DONE").thenReturn(order))
                 .flatMap(order -> updateOrder(order.changeStatus(command.getOrderStatus())))
@@ -78,23 +78,23 @@ public class OrderAdapter {
                 .thenReturn(true);
     }
 
-    private Mono<Boolean> updatePaymentStatusToFailure(PaymentStatusUpdateCommand command) {
+    private Mono<Boolean> updateOrderStatusToFailure(OrderStatusUpdateCommand command) {
         return orderRepository.findByOrderNo(command.getOrderNo())
                 .flatMap(order ->
-                        insertPaymentHistory(order, command.getOrderStatus(), command.getPaymentFailure().getMessage()).thenReturn(order))
+                        insertPaymentHistory(order, command.getOrderStatus(), command.getOrderFailure().getMessage()).thenReturn(order))
                 .flatMap(order -> updateOrder(order.changeStatus(command.getOrderStatus())))
                 .thenReturn(true);
     }
 
-    private Mono<Boolean> updatePaymentStatusToUnknown(PaymentStatusUpdateCommand command) {
+    private Mono<Boolean> updateOrderStatusToUnknown(OrderStatusUpdateCommand command) {
         return orderRepository.findByOrderNo(command.getOrderNo())
                 .flatMap(order ->
-                        insertPaymentHistory(order, command.getOrderStatus(), command.getPaymentFailure().getMessage()).thenReturn(order))
+                        insertPaymentHistory(order, command.getOrderStatus(), command.getOrderFailure().getMessage()).thenReturn(order))
                 .flatMap(order -> updateOrder(order.changeStatus(command.getOrderStatus()).increaseFailCount()))
                 .thenReturn(true);
     }
 
-    private Mono<PaymentEvent> savePaymentEvent(PaymentStatusUpdateCommand command, Order order) {
+    private Mono<PaymentEvent> savePaymentEvent(OrderStatusUpdateCommand command, Order order) {
         return paymentEventRepository.save(PaymentEvent.builder()
                 .orderId(order.getOrderId())
                 .paymentKey(order.getPaymentKey())
