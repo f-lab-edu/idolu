@@ -1,10 +1,10 @@
 package com.idolu.product.presentation.product;
 
 import com.idolu.product.application.product.ProductService;
-import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.global.common.ApiResponse;
 import com.idolu.product.presentation.product.request.ProductCreateRequest;
 import com.idolu.product.presentation.product.request.GetProductsByCategoryAndStoreRequest;
+import com.idolu.product.presentation.product.request.ProductStockUpdateRequest;
 import com.idolu.product.presentation.product.request.ProductUpdateRequest;
 import com.idolu.product.presentation.product.response.ProductCreateResponse;
 import com.idolu.product.presentation.product.response.ProductDetailResponse;
@@ -30,7 +30,7 @@ public class ProductController {
     public Mono<ApiResponse<ProductCreateResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         return productService.createProduct(request.toCommand())
                 .doOnNext(id -> log.info("id {} Product 생성", id))
-                .map(id -> ApiResponse.of(HttpStatus.CREATED, ProductCreateResponse.from(id)));
+                .map(id -> ApiResponse.ok(ProductCreateResponse.from(id)));
     }
 
     @GetMapping("/products")
@@ -50,5 +50,11 @@ public class ProductController {
         return productService.updateProduct(request.toCommand())
                 .doOnNext(id -> log.info("id {} Product 수정 완료", id))
                 .map(id -> ApiResponse.ok(ProductUpdateResponse.from(id)));
+    }
+
+    @PostMapping("/products/stocks")
+    public Mono<ApiResponse<Boolean>> updateProductStock(@RequestBody ProductStockUpdateRequest request) {
+        return productService.updateProductStock(request.toCommand())
+                .map(ApiResponse::ok);
     }
 }

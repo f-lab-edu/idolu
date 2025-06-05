@@ -39,4 +39,10 @@ public class UserController {
         return userService.reissue(request, response)
                 .map(ApiResponse::ok);
     }
+
+    @GetMapping("/validate")
+    public Mono<ApiResponse<Long>> validateAccessToken(ServerHttpRequest request) {
+        return userService.validateAccessToken(request)
+                .map(ApiResponse::ok);
+    }
 }

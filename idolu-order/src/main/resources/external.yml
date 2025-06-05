@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+external:
+  user:
+    url: http://localhost:10020
+  product:
+    url: http://localhost:10010
+  toss:
+    secretKey: ${TOSS_SECRETKEY}
+    url: https://api.tosspayments.com
+
+---

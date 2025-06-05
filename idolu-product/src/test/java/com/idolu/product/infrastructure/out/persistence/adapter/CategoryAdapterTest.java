@@ -1,9 +1,10 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
-import static com.idolu.product.global.exception.ErrorCode.PRODUCT_CATEGORIES_VALIDATION_FAILED;
+import static com.idolu.product.global.common.ResponseCode.PRODUCT_CATEGORIES_VALIDATION_FAILED;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import com.idolu.product.global.common.ProductException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.idolu.product.domain.category.Category;
-import com.idolu.product.global.exception.ProductCreateValidationException;
 import com.idolu.product.infrastructure.out.persistence.repository.CategoryRepository;
 
 import reactor.core.publisher.Mono;
@@ -50,7 +50,7 @@ class CategoryAdapterTest {
         StepVerifier.create(categoryAdapter.findByCategoryId(categoryId))
                 .verifyErrorSatisfies(e -> {
                     assertThat(e)
-                            .isInstanceOf(ProductCreateValidationException.class)
+                            .isInstanceOf(ProductException.class)
                             .hasMessage(PRODUCT_CATEGORIES_VALIDATION_FAILED.getMessage());
                 });
     }

@@ -6,6 +6,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'io.projectreactor.addons:reactor-extra'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -15,6 +16,10 @@ dependencies {
     // r2dbc
     runtimeOnly 'io.asyncer:r2dbc-mysql'
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.47.0'
 }
 
 tasks.named('test') {

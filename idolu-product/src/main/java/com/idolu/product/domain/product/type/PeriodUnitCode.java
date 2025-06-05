@@ -1,10 +1,6 @@
 package com.idolu.product.domain.product.type;
 
-import com.idolu.product.global.exception.BaseException;
-
 import java.util.Arrays;
-
-import static com.idolu.product.global.exception.ErrorCode.ENUM_VALIDATE_FAILED;
 
 public enum PeriodUnitCode {
     YEAR,
@@ -16,6 +12,6 @@ public enum PeriodUnitCode {
         return Arrays.stream(PeriodUnitCode.values())
                 .filter(periodUnitCode -> periodUnitCode.name().equals(code))
                 .findAny()
-                .orElseThrow(() -> new BaseException(ENUM_VALIDATE_FAILED, ENUM_VALIDATE_FAILED.getMessage().formatted(code)));
+                .orElseThrow(() -> new IllegalArgumentException("타입을 찾을 수 없습니다. PeriodCode: %s".formatted(code)));
     }
 }

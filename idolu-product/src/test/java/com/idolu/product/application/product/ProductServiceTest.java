@@ -2,7 +2,7 @@ package com.idolu.product.application.product;
 
 import com.idolu.product.application.product.command.ProductUpdateCommand;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.global.exception.ProductUpdateException;
+import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.adapter.ProductAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.idolu.product.global.exception.ErrorCode.*;
+import static com.idolu.product.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
@@ -43,8 +43,8 @@ class ProductServiceTest {
         StepVerifier.create(productService.updateProduct(command))
                 .verifyErrorSatisfies(e -> {
                     assertThat(e)
-                            .isInstanceOf(ProductUpdateException.class)
-                            .hasMessage(PRODUCT_INVALID_UPDATED_TIME.getMessage().formatted(command.getProductId()));
+                            .isInstanceOf(ProductException.class)
+                            .hasMessage(PRODUCT_INVALID_UPDATED_TIME.getMessage());
                 });
     }
 
