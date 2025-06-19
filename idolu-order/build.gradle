@@ -22,6 +22,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'io.projectreactor.addons:reactor-extra'
+
+    // kafka
+    implementation 'io.projectreactor.kafka:reactor-kafka'
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {
