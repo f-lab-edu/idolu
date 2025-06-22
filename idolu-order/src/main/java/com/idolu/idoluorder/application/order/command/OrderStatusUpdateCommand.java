@@ -14,13 +14,17 @@ public class OrderStatusUpdateCommand {
     private OrderStatus orderStatus;
     private PaymentExtraDetails extraDetails;
     private OrderFailure orderFailure;
+    private Long productId;
+    private Integer quantity;
 
     @Builder
-    public OrderStatusUpdateCommand(String paymentKey, String orderNo, OrderStatus orderStatus, PaymentExtraDetails extraDetails, OrderFailure orderFailure) {
+    public OrderStatusUpdateCommand(String paymentKey, String orderNo, OrderStatus orderStatus, PaymentExtraDetails extraDetails, OrderFailure orderFailure, Long productId, Integer quantity) {
         this.paymentKey = paymentKey;
         this.orderNo = orderNo;
         this.orderStatus = orderStatus;
         this.extraDetails = extraDetails;
         this.orderFailure = orderFailure;
+        this.productId = productId;
+        this.quantity = quantity;
     }
 }
