@@ -21,11 +21,13 @@ public class KafkaMessageSender {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendMessageAfterCommit(StockRollbackMessageCommand command) {
-        dispatchStockRollbackMessage(command);
+        dispatchStockRollbackMessage(command)
+                .onErrorContinue((e, o) -> log.error("sendMessageEvent: {}", e.toString()))
+                .subscribe();
     }
 
-    public void dispatchStockRollbackMessage(StockRollbackMessageCommand command) {
-        kafkaProducer.send(
+    public Mono<Boolean> dispatchStockRollbackMessage(StockRollbackMessageCommand command) {
+        return kafkaProducer.send(
                         command.getTopic(),
                         command.getKey(),
                         command.getPayload())
@@ -35,8 +37,6 @@ public class KafkaMessageSender {
                     }
 
                     return outboxAdapter.updateMessageStatus(command, MessageStatus.SUCCESS);
-                })
-                .onErrorContinue((e, o) -> log.error("sendMessageEvent: {}", e.toString()))
-                .subscribe();;
+                });
     }
 }
