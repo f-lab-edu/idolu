@@ -11,10 +11,8 @@ import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import com.idolu.idoluorder.global.common.OrderException;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.reactive.TransactionalEventPublisher;
 import reactor.core.publisher.Mono;
 
 import static com.idolu.idoluorder.domain.order.type.OrderStatus.CONFIRM_EXECUTING;
@@ -39,27 +37,11 @@ public class OrderAdapter {
     }
 
     @Transactional
-    public Mono<Order> updatePaymentPaymentStatusToExecuting(String orderNo, String paymentKey) {
-        return checkPaymentOrderStatus(orderNo)
+    public Mono<Order> updatePaymentPaymentStatusToExecuting(OrderConfirmCommand command) {
+        return checkPaymentOrderStatus(command.getOrderNo())
+                .filterWhen(order -> validateOrder(order, command))
                 .flatMap(order -> insertPaymentHistory(order, CONFIRM_EXECUTING, "CONFIRMATION_START").thenReturn(order))
-                .flatMap(order -> orderRepository.save(order.toExecutingWithPaymentKey(paymentKey)));
-    }
-
-    @Transactional(readOnly = true)
-    public Mono<Boolean> validateOrder(Order order, OrderConfirmCommand command) {
-        return orderItemRepository.findByOrderId(order.getOrderId())
-                .collectList()
-                .filter(orderItems -> {
-                    OrderItem matchedItem = orderItems.stream()
-                            .filter(orderItem -> orderItem.getProductId().equals(command.getProductId()))
-                            .findFirst()
-                            .orElseThrow(() -> new OrderException(INVALID_ORDER_REQUEST));
-
-                    return matchedItem.getAmount().equals(command.getAmount()) &&
-                            matchedItem.getQuantity().equals(command.getQuantity());
-                })
-                .switchIfEmpty(Mono.error(new OrderException(INVALID_ORDER_REQUEST)))
-                .thenReturn(true);
+                .flatMap(order -> orderRepository.save(order.toExecutingWithPaymentKey(command.getPaymentKey())));
     }
 
     @Transactional
@@ -134,5 +116,21 @@ public class OrderAdapter {
                         case CONFIRM_FAILURE -> sink.error(new OrderException(ALREADY_FAILURE_ORDER));
                     }
                 });
+    }
+
+    private Mono<Boolean> validateOrder(Order order, OrderConfirmCommand command) {
+        return orderItemRepository.findByOrderId(order.getOrderId())
+                .collectList()
+                .filter(orderItems -> {
+                    OrderItem matchedItem = orderItems.stream()
+                            .filter(orderItem -> orderItem.getProductId().equals(command.getProductId()))
+                            .findFirst()
+                            .orElseThrow(() -> new OrderException(INVALID_ORDER_REQUEST));
+
+                    return matchedItem.getAmount().equals(command.getAmount()) &&
+                            matchedItem.getQuantity().equals(command.getQuantity());
+                })
+                .switchIfEmpty(Mono.error(new OrderException(INVALID_ORDER_REQUEST)))
+                .thenReturn(true);
     }
 }

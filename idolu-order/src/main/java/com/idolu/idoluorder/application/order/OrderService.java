@@ -45,8 +45,7 @@ public class OrderService {
     }
 
     public Mono<OrderConfirmationResponse> confirm(OrderConfirmCommand command) {
-        return orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderNo(), command.getPaymentKey())
-                .filterWhen(order -> orderAdapter.validateOrder(order, command))
+        return orderAdapter.updatePaymentPaymentStatusToExecuting(command)
                 .filterWhen(order -> productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
                         .productId(command.getProductId())
                         .stock(command.getQuantity())
