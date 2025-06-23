@@ -16,11 +16,14 @@ public class StockRollbackMessageCommand {
     @Builder
     @Getter
     public static class Payload {
+
+        private String orderNo;
         private Long productId;
         private Integer quantity;
 
         public static Payload from(OrderStatusUpdateCommand command) {
             return Payload.builder()
+                    .orderNo(command.getOrderNo())
                     .productId(command.getProductId())
                     .quantity(command.getQuantity())
                     .build();

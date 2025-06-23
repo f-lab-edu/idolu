@@ -22,21 +22,21 @@ public class Outbox extends BaseEntity {
 
     private String topic;
 
-    private String key;
+    private String topicKey;
 
-    private String message;
+    private String payload;
 
     private MessageStatus status;
 
     @Builder
     @PersistenceCreator
-    public Outbox(LocalDateTime createdAt, LocalDateTime updatedAt, Long outboxId, MessageType type, String topic, String key, String message, MessageStatus status) {
+    public Outbox(LocalDateTime createdAt, LocalDateTime updatedAt, Long outboxId, MessageType type, String topic, String topicKey, String payload, MessageStatus status) {
         super(createdAt, updatedAt);
         this.outboxId = outboxId;
         this.type = type;
         this.topic = topic;
-        this.key = key;
-        this.message = message;
+        this.topicKey = topicKey;
+        this.payload = payload;
         this.status = status;
     }
 }

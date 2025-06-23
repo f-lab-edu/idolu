@@ -28,8 +28,8 @@ public class OutboxAdapter {
         return outboxRepository.save(Outbox.builder()
                         .type(stockRollbackMessageCommand.getType())
                         .topic(stockRollbackMessageCommand.getTopic())
-                        .key(stockRollbackMessageCommand.getKey())
-                        .message(stockRollbackMessageCommand.getPayload())
+                        .topicKey(stockRollbackMessageCommand.getKey())
+                        .payload(stockRollbackMessageCommand.getPayload())
                         .status(MessageStatus.INIT)
                         .build())
                 .thenReturn(stockRollbackMessageCommand);
