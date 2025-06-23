@@ -39,4 +39,9 @@ public class Outbox extends BaseEntity {
         this.payload = payload;
         this.status = status;
     }
+
+    public Outbox updateMessageStatus(MessageStatus messageStatus) {
+        this.status = messageStatus;
+        return this;
+    }
 }

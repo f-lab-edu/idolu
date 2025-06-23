@@ -51,4 +51,10 @@ public class OutboxAdapter {
             throw new RuntimeException(e);
         }
     }
+
+    public Mono<Boolean> updateMessageStatus(StockRollbackMessageCommand command, MessageStatus messageStatus) {
+        return outboxRepository.findOutboxByTopicKeyAndType(command.getKey(), command.getType())
+                .flatMap(outbox -> outboxRepository.save(outbox.updateMessageStatus(messageStatus)))
+                .thenReturn(true);
+    }
 }
