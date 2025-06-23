@@ -47,7 +47,6 @@ public class OrderAdapter {
     @Transactional
     public Mono<Boolean> updateOrderStatus(OrderStatusUpdateCommand command) {
         return switch (command.getOrderStatus()) {
-            case CONFIRM_SUCCESS -> updateOrderStatusToSuccess(command);
             case CONFIRM_FAILURE -> updateOrderStatusToFailure(command);
             case CONFIRM_UNKNOWN -> updateOrderStatusToUnknown(command);
             default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
@@ -56,6 +55,15 @@ public class OrderAdapter {
 
     @Transactional
     public Mono<Boolean> updateOrderStatusByPaymentRequestException(OrderStatusUpdateCommand command) {
+        return switch (command.getOrderStatus()) {
+            case CONFIRM_SUCCESS -> updateOrderStatusToSuccess(command);
+            case CONFIRM_FAILURE -> updateOrderStatusToFailureByPaymentRequestException(command);
+            case CONFIRM_UNKNOWN -> updateOrderStatusToUnknown(command);
+            default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
+        };
+    }
+
+    private Mono<Boolean> updateOrderStatusToFailureByPaymentRequestException(OrderStatusUpdateCommand command) {
         return updateOrderStatusToFailure(command)
                 .flatMap(result -> outboxAdapter.savePaymentFailureEventMessage(command))
                 .flatMap(eventMessagePublisher::publishEvent)
