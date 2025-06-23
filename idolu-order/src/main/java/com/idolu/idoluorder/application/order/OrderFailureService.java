@@ -111,6 +111,8 @@ public class OrderFailureService {
                         .orderNo(command.getOrderNo())
                         .orderStatus(orderStatus)
                         .orderFailure(orderFailure)
+                        .productId(command.getProductId())
+                        .quantity(command.getQuantity())
                         .build())
                 .map(result -> OrderConfirmationResponse.builder()
                         .status(orderStatus)
@@ -126,11 +128,13 @@ public class OrderFailureService {
                 .message(paymentRequestException.getErrorMessage())
                 .build();
 
-        return orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
+        return orderAdapter.updateOrderStatusByPaymentRequestException(OrderStatusUpdateCommand.builder()
                         .paymentKey(command.getPaymentKey())
                         .orderNo(command.getOrderNo())
                         .orderStatus(orderStatus)
                         .orderFailure(orderFailure)
+                        .productId(command.getProductId())
+                        .quantity(command.getQuantity())
                         .build())
                 .map(result -> OrderConfirmationResponse.builder()
                         .status(orderStatus)
