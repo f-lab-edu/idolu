@@ -86,7 +86,7 @@ class OrderFailureServiceTest {
                 .orderNo("dummy-order-no")
                 .build();
 
-        Mockito.when(orderAdapter.updateOrderStatus(Mockito.any()))
+        Mockito.when(orderAdapter.finalizeOrderStatus(Mockito.any()))
                 .thenReturn(Mono.just(true));
 
         // when, then

@@ -41,7 +41,7 @@ public class OrderFailureService {
                             .message(exception.getMessage())
                             .build();
 
-                    return orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
+                    return orderAdapter.finalizeOrderStatus(OrderStatusUpdateCommand.builder()
                                     .paymentKey(command.getPaymentKey())
                                     .orderNo(command.getOrderNo())
                                     .orderStatus(orderStatus)
@@ -86,7 +86,7 @@ public class OrderFailureService {
                     .build();
         }
 
-        return orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
+        return orderAdapter.finalizeOrderStatus(OrderStatusUpdateCommand.builder()
                         .paymentKey(command.getPaymentKey())
                         .orderNo(command.getOrderNo())
                         .orderStatus(orderStatus)
@@ -106,7 +106,7 @@ public class OrderFailureService {
                 .message(productRequestException.getResponse())
                 .build();
 
-        return orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
+        return orderAdapter.finalizeOrderStatus(OrderStatusUpdateCommand.builder()
                         .paymentKey(command.getPaymentKey())
                         .orderNo(command.getOrderNo())
                         .orderStatus(orderStatus)

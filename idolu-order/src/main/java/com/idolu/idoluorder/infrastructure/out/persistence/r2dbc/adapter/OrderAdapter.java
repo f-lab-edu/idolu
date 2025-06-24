@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
-import static com.idolu.idoluorder.domain.order.type.OrderStatus.CONFIRM_EXECUTING;
+import static com.idolu.idoluorder.domain.order.type.OrderStatus.CONFIRM_PRODUCT_EXECUTING;
 import static com.idolu.idoluorder.global.common.ResponseCode.*;
 
 @Component
@@ -40,13 +40,20 @@ public class OrderAdapter {
     public Mono<Order> updatePaymentPaymentStatusToExecuting(OrderConfirmCommand command) {
         return checkPaymentOrderStatus(command.getOrderNo())
                 .filterWhen(order -> validateOrder(order, command))
-                .flatMap(order -> insertPaymentHistory(order, CONFIRM_EXECUTING, "CONFIRMATION_START").thenReturn(order))
+                .flatMap(order -> insertPaymentHistory(order, CONFIRM_PRODUCT_EXECUTING, "CONFIRMATION_PRODUCT_START").thenReturn(order))
                 .flatMap(order -> orderRepository.save(order.toExecutingWithPaymentKey(command.getPaymentKey())));
     }
 
     @Transactional
-    public Mono<Boolean> updateOrderStatus(OrderStatusUpdateCommand command) {
+    public Mono<Order> updateOrderStatus(Order order, OrderStatus orderStatus, String reason) {
+        return insertPaymentHistory(order, orderStatus, reason)
+                .flatMap(result -> orderRepository.save(order.changeStatus(orderStatus)));
+    }
+
+    @Transactional
+    public Mono<Boolean> finalizeOrderStatus(OrderStatusUpdateCommand command) {
         return switch (command.getOrderStatus()) {
+            case CONFIRM_SUCCESS -> updateOrderStatusToSuccess(command);
             case CONFIRM_FAILURE -> updateOrderStatusToFailure(command);
             case CONFIRM_UNKNOWN -> updateOrderStatusToUnknown(command);
             default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
@@ -56,7 +63,6 @@ public class OrderAdapter {
     @Transactional
     public Mono<Boolean> updateOrderStatusByPaymentRequestException(OrderStatusUpdateCommand command) {
         return switch (command.getOrderStatus()) {
-            case CONFIRM_SUCCESS -> updateOrderStatusToSuccess(command);
             case CONFIRM_FAILURE -> updateOrderStatusToFailureByPaymentRequestException(command);
             case CONFIRM_UNKNOWN -> updateOrderStatusToUnknown(command);
             default -> Mono.error(new IllegalArgumentException("결제 상태(status: %s)는 올바르지 않습니다.".formatted(command.getOrderNo())));
@@ -119,7 +125,7 @@ public class OrderAdapter {
                 .switchIfEmpty(Mono.error(new OrderException(ORDER_NOT_FOUND)))
                 .handle((order, sink) -> {
                     switch (order.getOrderStatus()) {
-                        case NOT_STARTED, CONFIRM_UNKNOWN, CONFIRM_EXECUTING -> sink.next(order);
+                        case NOT_STARTED, CONFIRM_UNKNOWN, CONFIRM_PRODUCT_EXECUTING -> sink.next(order);
                         case CONFIRM_SUCCESS -> sink.error(new OrderException(ALREADY_SUCCESS_ORDER));
                         case CONFIRM_FAILURE -> sink.error(new OrderException(ALREADY_FAILURE_ORDER));
                     }

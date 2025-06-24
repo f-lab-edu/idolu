@@ -4,7 +4,6 @@ import com.idolu.idoluorder.application.order.command.CheckoutCommand;
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
 import com.idolu.idoluorder.application.order.command.OrderStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
-import com.idolu.idoluorder.domain.order.OrderFailure;
 import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
@@ -51,9 +50,10 @@ public class OrderService {
                         .stock(command.getQuantity())
                         .stockType("DECREASE")
                         .build()))
+                .flatMap(order -> orderAdapter.updateOrderStatus(order, OrderStatus.CONFIRM_PAYMENT_EXECUTING, "CONFIRMATION_PAYMENT_START"))
                 .flatMap(order -> paymentExecutorAdapter.execute(command))
                 .flatMap(paymentExecutionResult ->
-                        orderAdapter.updateOrderStatus(OrderStatusUpdateCommand.builder()
+                        orderAdapter.finalizeOrderStatus(OrderStatusUpdateCommand.builder()
                                         .paymentKey(paymentExecutionResult.getPaymentKey())
                                         .orderNo(paymentExecutionResult.getOrderNo())
                                         .orderStatus(paymentExecutionResult.toOrderStatus())
