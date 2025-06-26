@@ -5,11 +5,12 @@ import com.idolu.product.application.product.command.ProductStockRollbackCommand
 import com.idolu.product.global.utils.JsonConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
+import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
-import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
@@ -19,6 +20,10 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class StockRollbackConsumer {
 
+    @Value("${spring.kafka.consumer.topics.order-stock-rollback-dlt}")
+    private String dltTopic;
+
+    private final ReactiveKafkaProducerTemplate<String, String> kafkaProducer;
     private final JsonConverter jsonConverter;
     private final ProductStockRollbackService productStockRollbackService;
 
@@ -37,10 +42,11 @@ public class StockRollbackConsumer {
                                         .doBeforeRetry(retrySignal -> log.error("retryCount: {}, errorCode: {}", retrySignal.totalRetries(), retrySignal.failure().getMessage()))
                                         .onRetryExhaustedThrow((spec, retrySignal) -> retrySignal.failure()))
                                 .onErrorResume(error -> {
-                                    log.error("consume stock rollback message: {}", error.getMessage());
-                                    return Mono.just(true);
+                                    log.error("consume stock rollback message error", error);
+                                    return kafkaProducer.send(dltTopic, record.key(), record.value())
+                                            .thenReturn(true);
                                 })
-                                .doOnSuccess(result -> record.receiverOffset().acknowledge());
+                                .doOnSuccess(result -> record.receiverOffset().acknowledge()); // commit 처리
                     });
                 })
                 .subscribe();
