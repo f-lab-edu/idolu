@@ -18,6 +18,7 @@ public enum ResponseCode {
     PRODUCT_INSUFFICIENT_STOCK("PRODUCT-0007", "상품 재고 부족"),
     PRODUCT_IMAGE_NOT_FOUND("PRODUCT-0008", "잘못된 상품 이미지 정보 조회"),
     STORE_NOT_FOUND("PRODUCT-0009", "잘못된 회원사 정보 조회"),
+    ALREADY_STOCK_UPDATE("PRODUCT-0010", "이미 처리된 주문 재고 업데이트"),
     SERVER_ERROR("PRODUCT-1999", "서버 오류"),
     ;
 
