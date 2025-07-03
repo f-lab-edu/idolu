@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.util.retry.Retry;
 
-import java.time.Duration;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,6 +24,7 @@ public class StockRollbackConsumer {
     private final ReactiveKafkaProducerTemplate<String, String> kafkaProducer;
     private final JsonConverter jsonConverter;
     private final ProductStockRollbackService productStockRollbackService;
+    private final Retry defaultBackoffRetry;
 
     @Bean
     public Disposable kafkaListener(ReactiveKafkaConsumerTemplate<String, String> consumerTemplate) {
@@ -38,9 +37,7 @@ public class StockRollbackConsumer {
                         ProductStockRollbackCommand command = jsonConverter.toJson(record.value(), ProductStockRollbackCommand.class);
 
                         return productStockRollbackService.stockRollback(command)
-                                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)).jitter(0.1)
-                                        .doBeforeRetry(retrySignal -> log.error("retryCount: {}, errorCode: {}", retrySignal.totalRetries(), retrySignal.failure().getMessage()))
-                                        .onRetryExhaustedThrow((spec, retrySignal) -> retrySignal.failure()))
+                                .retryWhen(defaultBackoffRetry)
                                 .onErrorResume(error -> {
                                     log.error("consume stock rollback message error", error);
                                     return kafkaProducer.send(dltTopic, record.key(), record.value())
