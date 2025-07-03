@@ -18,9 +18,9 @@ public class PaymentExecutionResult {
     private Boolean isRetryable;
 
     public OrderStatus toOrderStatus() {
-        if (Boolean.TRUE.equals(isSuccess)) return OrderStatus.SUCCESS;
-        if (Boolean.TRUE.equals(isFailure)) return OrderStatus.FAILURE;
-        if (Boolean.TRUE.equals(isUnknown)) return OrderStatus.UNKNWOKN;
+        if (Boolean.TRUE.equals(isSuccess)) return OrderStatus.CONFIRM_SUCCESS;
+        if (Boolean.TRUE.equals(isFailure)) return OrderStatus.CONFIRM_FAILURE;
+        if (Boolean.TRUE.equals(isUnknown)) return OrderStatus.CONFIRM_UNKNOWN;
         throw new IllegalArgumentException("결제(orderNo: %s)는 올바르지 않은 결제 상태입니다.".formatted(orderNo));
     }
 }

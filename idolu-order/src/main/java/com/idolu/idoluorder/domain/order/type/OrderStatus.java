@@ -2,9 +2,10 @@ package com.idolu.idoluorder.domain.order.type;
 
 public enum OrderStatus {
     NOT_STARTED,
-    EXECUTING,
-    SUCCESS,
-    FAILURE,
-    UNKNWOKN,
+    CONFIRM_PRODUCT_EXECUTING,
+    CONFIRM_PAYMENT_EXECUTING,
+    CONFIRM_SUCCESS,
+    CONFIRM_FAILURE,
+    CONFIRM_UNKNOWN,
     ;
 }

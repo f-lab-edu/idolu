@@ -22,8 +22,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.idolu.idoluorder.infrastructure.out.web.response.TossPaymentError.*;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -69,7 +67,7 @@ public class PaymentExecutorAdapter {
     private Mono<PaymentRequestException> createTossPaymentException(ClientResponse clientResponse) {
         return clientResponse.bodyToMono(TossPaymentConfirmationResponse.TossFailureResponse.class)
                 .flatMap(response -> {
-                    TossPaymentError tossPaymentError = toTossPaymentError(response.getCode());
+                    TossPaymentError tossPaymentError = TossPaymentError.from(response.getCode());
                     return Mono.error(PaymentRequestException.builder()
                             .errorCode(tossPaymentError.name())
                             .errorMessage(tossPaymentError.getDescription())

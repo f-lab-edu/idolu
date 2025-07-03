@@ -73,7 +73,7 @@ public enum TossPaymentError {
             FAILED_INTERNAL_SYSTEM_PROCESSING, // "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."
             FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING); // "결제가 완료되지 않았어요. 다시 시도해주세요."
 
-    public static TossPaymentError toTossPaymentError(String errorCode) {
+    public static TossPaymentError from(String errorCode) {
         return Arrays.stream(TossPaymentError.values())
                 .filter(tossPaymentError -> tossPaymentError.name().equals(errorCode))
                 .findFirst()

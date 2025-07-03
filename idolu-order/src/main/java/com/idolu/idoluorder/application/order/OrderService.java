@@ -2,17 +2,17 @@ package com.idolu.idoluorder.application.order;
 
 import com.idolu.idoluorder.application.order.command.CheckoutCommand;
 import com.idolu.idoluorder.application.order.command.OrderConfirmCommand;
-import com.idolu.idoluorder.application.order.command.PaymentStatusUpdateCommand;
+import com.idolu.idoluorder.application.order.command.OrderStatusUpdateCommand;
 import com.idolu.idoluorder.domain.order.Order;
 import com.idolu.idoluorder.domain.order.OrderItem;
 import com.idolu.idoluorder.domain.order.type.OrderStatus;
-import com.idolu.idoluorder.domain.payment.PaymentExecutionResult;
 import com.idolu.idoluorder.infrastructure.out.persistence.r2dbc.adapter.OrderAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.PaymentExecutorAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.ProductAdapter;
 import com.idolu.idoluorder.infrastructure.out.web.request.ProductStockUpdateRequest;
 import com.idolu.idoluorder.infrastructure.out.web.response.ProductDetailResponse;
 import com.idolu.idoluorder.presentation.order.response.CheckoutResponse;
+import com.idolu.idoluorder.presentation.order.response.OrderConfirmationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,7 @@ public class OrderService {
     private final ProductAdapter productAdapter;
     private final OrderAdapter orderAdapter;
     private final PaymentExecutorAdapter paymentExecutorAdapter;
+    private final OrderFailureService orderFailureService;
 
     public Mono<CheckoutResponse> checkout(CheckoutCommand command) {
         return productAdapter.getProductInformation(command.getProductId())
@@ -42,24 +43,27 @@ public class OrderService {
                         .build());
     }
 
-    public Mono<PaymentExecutionResult> confirm(OrderConfirmCommand command) {
-        return orderAdapter.updatePaymentPaymentStatusToExecuting(command.getOrderNo(), command.getPaymentKey())
-                .filterWhen(order -> orderAdapter.validateOrder(order, command))
+    public Mono<OrderConfirmationResponse> confirm(OrderConfirmCommand command) {
+        return orderAdapter.updatePaymentPaymentStatusToExecuting(command)
                 .filterWhen(order -> productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
                         .productId(command.getProductId())
                         .stock(command.getQuantity())
                         .stockType("DECREASE")
                         .build()))
+                .flatMap(order -> orderAdapter.updateOrderStatus(order, OrderStatus.CONFIRM_PAYMENT_EXECUTING, "CONFIRMATION_PAYMENT_START"))
                 .flatMap(order -> paymentExecutorAdapter.execute(command))
                 .flatMap(paymentExecutionResult ->
-                        orderAdapter.updatePaymentStatus(PaymentStatusUpdateCommand.builder()
+                        orderAdapter.finalizeOrderStatus(OrderStatusUpdateCommand.builder()
                                         .paymentKey(paymentExecutionResult.getPaymentKey())
                                         .orderNo(paymentExecutionResult.getOrderNo())
                                         .orderStatus(paymentExecutionResult.toOrderStatus())
                                         .extraDetails(paymentExecutionResult.getExtraDetails())
-                                        .paymentFailure(paymentExecutionResult.getFailure())
                                         .build())
-                                .thenReturn(paymentExecutionResult));
+                                .thenReturn(paymentExecutionResult))
+                .map(paymentExecutionResult -> OrderConfirmationResponse.builder()
+                        .status(paymentExecutionResult.toOrderStatus())
+                        .build())
+                .onErrorResume(error -> orderFailureService.handleOrderConfirmationError(error, command));
     }
 
     private OrderItem createOrderItem(ProductDetailResponse product, CheckoutCommand command) {

@@ -15,6 +15,8 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_ROOT_PASSWORD}
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092,localhost:49092
 logging:
   level:
     org.springframework.r2dbc: DEBUG
