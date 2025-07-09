@@ -1,9 +1,13 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
+import com.idolu.product.application.product.command.ProductStockRollbackCommand;
+import com.idolu.product.domain.product.InventoryUpdateLog;
 import com.idolu.product.domain.product.Product;
+import com.idolu.product.domain.product.type.StockType;
 import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
+import com.idolu.product.infrastructure.out.persistence.repository.InventoryUpdateLogRepository;
 import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.ProductItemDto;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +34,7 @@ public class ProductAdapter {
     private final ProductDiscountAdapter productDiscountAdapter;
     private final ProductImageAdapter productImageAdapter;
     private final DatabaseClient databaseClient;
+    private final InventoryUpdateLogRepository inventoryUpdateLogRepository;
 
     @Transactional
     public Mono<Long> createProduct(Product product) {
@@ -122,6 +127,22 @@ public class ProductAdapter {
     @Transactional
     public Mono<Product> updateStock(Product product) {
         return productRepository.save(product);
+    }
+
+    @Transactional
+    public Mono<Boolean> stockRollback(ProductStockRollbackCommand command) {
+        return inventoryUpdateLogRepository.findInventoryUpdateLogByOrderNoAndType(command.getOrderNo(), StockType.INCREASE)
+                .handle((__, sink) -> sink.error(new ProductBadRequestException(ALREADY_STOCK_UPDATE))) // 이미 처리되어 예외 발생
+                .switchIfEmpty(Mono.just(true))
+                .flatMap(__ -> inventoryUpdateLogRepository.save(InventoryUpdateLog.builder()
+                        .productId(command.getProductId())
+                        .orderNo(command.getOrderNo())
+                        .quantity(command.getQuantity())
+                        .type(StockType.INCREASE)
+                        .build()))
+                .flatMap(__ -> productRepository.findByProductId(command.getProductId()))
+                .flatMap(product -> productRepository.save(product.updateStock(command.getQuantity(), StockType.INCREASE)))
+                .thenReturn(true);
     }
 
     private Mono<Product> deleteOldProductRelations(Product product) {
