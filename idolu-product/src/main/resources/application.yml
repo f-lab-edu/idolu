@@ -18,6 +18,14 @@ spring:
       database: ${REDIS_DATABASE}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:39092,localhost:49092
+    consumer:
+      group-id:
+        order: order-stock-consumer
+      topics:
+        order-stock-rollback: order.product-stock-rollback
+        order-stock-rollback-dlt: order.product-stock-rollback.dlt
 logging:
   level:
     org:
