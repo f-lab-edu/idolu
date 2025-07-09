@@ -4,6 +4,7 @@ import com.idolu.product.application.product.command.ProductCreateCommand;
 import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
 import com.idolu.product.application.product.command.ProductStockUpdateCommand;
 import com.idolu.product.application.product.command.ProductUpdateCommand;
+import com.idolu.product.domain.product.InventoryUpdateLog;
 import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductDiscount;
 import com.idolu.product.domain.product.ProductImage;
@@ -12,6 +13,8 @@ import com.idolu.product.global.annotation.DistributedLock;
 import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.adapter.*;
+import com.idolu.product.infrastructure.out.persistence.repository.InventoryUpdateLogRepository;
+import com.idolu.product.infrastructure.out.persistence.repository.ProductRepository;
 import com.idolu.product.presentation.product.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,8 @@ public class ProductService {
     private final StoreAdapter storeAdapter;
     private final ProductImageAdapter productImageAdapter;
     private final ProductDiscountAdapter productDiscountAdapter;
+    private final InventoryUpdateLogRepository inventoryUpdateLogRepository;
+    private final ProductRepository productRepository;
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.findByCategoryId(command.getCategoryId())
@@ -92,15 +97,17 @@ public class ProductService {
 
     @DistributedLock(lockName = "productStock", identifier = "productId", paramClassType = ProductStockUpdateCommand.class)
     public Mono<Boolean> updateProductStock(ProductStockUpdateCommand command) {
-        return productAdapter.findById(command.getProductId())
-                .flatMap(product -> {
-                    Product updatedProduct = product.updateStock(command.getStock(), command.getStockType());
-                    if (updatedProduct.getStock() < 0) {
-                        return Mono.error(new ProductBadRequestException(PRODUCT_INSUFFICIENT_STOCK));
-                    }
-
-                    return productAdapter.updateStock(updatedProduct);
-                })
+        return inventoryUpdateLogRepository.findInventoryUpdateLogByOrderNoAndType(command.getOrderNo(), command.getStockType())
+                .handle((__, sink) -> sink.error(new ProductBadRequestException(ALREADY_STOCK_UPDATE))) // 이미 처리된 주문 재고 변경건
+                .switchIfEmpty(Mono.just(true))
+                .flatMap(__ -> inventoryUpdateLogRepository.save(InventoryUpdateLog.builder()
+                        .productId(command.getProductId())
+                        .orderNo(command.getOrderNo())
+                        .quantity(command.getStock())
+                        .type(command.getStockType())
+                        .build()))
+                .flatMap(__ -> productAdapter.findById(command.getProductId()))
+                .flatMap(product -> productRepository.save(product.updateStock(command.getStock(), command.getStockType())))
                 .thenReturn(true);
     }
 
