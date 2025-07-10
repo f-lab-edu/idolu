@@ -34,7 +34,7 @@ public class OrderService {
 
     public Mono<CheckoutResponse> checkout(CheckoutCommand command) {
         return productAdapter.getProductInformation(command.getProductId())
-                .flatMap( product ->
+                .flatMap(product ->
                         orderAdapter.checkoutOrder(createOrder(command).withOrderItem(createOrderItem(product, command))))
                 .map(order -> CheckoutResponse.builder()
                         .orderId(order.getOrderId())
@@ -46,6 +46,7 @@ public class OrderService {
     public Mono<OrderConfirmationResponse> confirm(OrderConfirmCommand command) {
         return orderAdapter.updatePaymentPaymentStatusToExecuting(command)
                 .filterWhen(order -> productAdapter.decreaseProductStock(ProductStockUpdateRequest.builder()
+                        .orderNo(command.getOrderNo())
                         .productId(command.getProductId())
                         .stock(command.getQuantity())
                         .stockType("DECREASE")

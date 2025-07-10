@@ -7,11 +7,13 @@ import lombok.Getter;
 public class ProductStockUpdateRequest {
 
     private Long productId;
+    private String orderNo;
     private Integer stock;
     private String stockType;
 
     public ProductStockUpdateCommand toCommand() {
         return ProductStockUpdateCommand.builder()
+                .orderNo(this.orderNo)
                 .productId(this.productId)
                 .stock(this.stock)
                 .stockType(this.stockType)

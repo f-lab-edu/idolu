@@ -1,7 +1,7 @@
 package com.idolu.product.infrastructure.in.kafka;
 
-import com.idolu.product.application.product.ProductStockRollbackService;
-import com.idolu.product.application.product.command.ProductStockRollbackCommand;
+import com.idolu.product.application.product.ProductService;
+import com.idolu.product.application.product.command.ProductStockUpdateCommand;
 import com.idolu.product.global.utils.JsonConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class StockRollbackConsumer {
 
     private final ReactiveKafkaProducerTemplate<String, String> kafkaProducer;
     private final JsonConverter jsonConverter;
-    private final ProductStockRollbackService productStockRollbackService;
+    private final ProductService productService;
     private final Retry defaultBackoffRetry;
 
     @Bean
@@ -34,9 +34,9 @@ public class StockRollbackConsumer {
                 .flatMap(partitions -> {
                     // Partition 별로 record 순차적으로 실행
                     return partitions.concatMap(record -> {
-                        ProductStockRollbackCommand command = jsonConverter.toJson(record.value(), ProductStockRollbackCommand.class);
+                        ProductStockUpdateCommand command = jsonConverter.toJson(record.value(), ProductStockUpdateCommand.class);
 
-                        return productStockRollbackService.stockRollback(command)
+                        return productService.updateProductStock(command)
                                 .retryWhen(defaultBackoffRetry)
                                 .onErrorResume(error -> {
                                     log.error("consume stock rollback message error", error);

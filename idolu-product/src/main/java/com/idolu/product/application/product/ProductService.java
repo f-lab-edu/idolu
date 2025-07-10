@@ -8,8 +8,6 @@ import com.idolu.product.domain.product.Product;
 import com.idolu.product.domain.product.ProductDiscount;
 import com.idolu.product.domain.product.ProductImage;
 import com.idolu.product.domain.product.type.ImageType;
-import com.idolu.product.global.annotation.DistributedLock;
-import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.adapter.*;
 import com.idolu.product.presentation.product.response.*;
@@ -18,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
+import reactor.util.retry.Retry;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +33,7 @@ public class ProductService {
     private final StoreAdapter storeAdapter;
     private final ProductImageAdapter productImageAdapter;
     private final ProductDiscountAdapter productDiscountAdapter;
+    private final Retry optimisticLockingBackoffRetry;
 
     public Mono<Long> createProduct(ProductCreateCommand command) {
         return categoryAdapter.findByCategoryId(command.getCategoryId())
@@ -90,18 +90,9 @@ public class ProductService {
                 .map(Product::getProductId);
     }
 
-    @DistributedLock(lockName = "productStock", identifier = "productId", paramClassType = ProductStockUpdateCommand.class)
     public Mono<Boolean> updateProductStock(ProductStockUpdateCommand command) {
-        return productAdapter.findById(command.getProductId())
-                .flatMap(product -> {
-                    Product updatedProduct = product.updateStock(command.getStock(), command.getStockType());
-                    if (updatedProduct.getStock() < 0) {
-                        return Mono.error(new ProductBadRequestException(PRODUCT_INSUFFICIENT_STOCK));
-                    }
-
-                    return productAdapter.updateStock(updatedProduct);
-                })
-                .thenReturn(true);
+        return productAdapter.updateProductStock(command)
+                .retryWhen(optimisticLockingBackoffRetry);
     }
 
     private ProductDetailResponse generateProductDetailResponse(Product product, List<ProductImage> productImages, List<ProductDiscount> productDiscounts) {

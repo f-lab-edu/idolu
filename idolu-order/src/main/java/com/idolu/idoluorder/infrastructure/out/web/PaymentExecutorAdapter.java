@@ -31,8 +31,9 @@ public class PaymentExecutorAdapter {
 
     public Mono<PaymentExecutionResult> execute(OrderConfirmCommand command) {
         return tossWebClient.post()
-                .uri("/v1/payments/confirm")
+                .uri("/v1/payments/key-in")
                 .header("Idempotency-Key", command.getOrderNo())
+                .header("TossPayments-Test-Code", TossPaymentError.INVALID_CARD_EXPIRATION.name())
                 .bodyValue(PaymentExecutionRequest.builder()
                         .paymentKey(command.getPaymentKey())
                         .orderId(command.getOrderNo())

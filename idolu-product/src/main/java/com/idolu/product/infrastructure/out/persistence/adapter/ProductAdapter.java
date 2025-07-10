@@ -1,10 +1,10 @@
 package com.idolu.product.infrastructure.out.persistence.adapter;
 
 import com.idolu.product.application.product.command.GetProductsByCategoryAndStoreCommand;
-import com.idolu.product.application.product.command.ProductStockRollbackCommand;
+import com.idolu.product.application.product.command.ProductStockUpdateCommand;
 import com.idolu.product.domain.product.InventoryUpdateLog;
 import com.idolu.product.domain.product.Product;
-import com.idolu.product.domain.product.type.StockType;
+import com.idolu.product.global.annotation.DistributedLock;
 import com.idolu.product.global.common.ProductBadRequestException;
 import com.idolu.product.global.common.ProductException;
 import com.idolu.product.infrastructure.out.persistence.repository.InventoryUpdateLogRepository;
@@ -124,24 +124,19 @@ public class ProductAdapter {
                 .flatMap(this::saveNewProductRelations);
     }
 
-    @Transactional
-    public Mono<Product> updateStock(Product product) {
-        return productRepository.save(product);
-    }
-
-    @Transactional
-    public Mono<Boolean> stockRollback(ProductStockRollbackCommand command) {
-        return inventoryUpdateLogRepository.findInventoryUpdateLogByOrderNoAndType(command.getOrderNo(), StockType.INCREASE)
-                .handle((__, sink) -> sink.error(new ProductBadRequestException(ALREADY_STOCK_UPDATE))) // 이미 처리되어 예외 발생
+    @DistributedLock(lockName = "productStock", identifier = "productId", paramClassType = ProductStockUpdateCommand.class)
+    public Mono<Boolean> updateProductStock(ProductStockUpdateCommand command) {
+        return inventoryUpdateLogRepository.findInventoryUpdateLogByOrderNoAndType(command.getOrderNo(), command.getStockType())
+                .handle((__, sink) -> sink.error(new ProductBadRequestException(ALREADY_STOCK_UPDATE))) // 이미 처리된 주문 재고 변경건
                 .switchIfEmpty(Mono.just(true))
                 .flatMap(__ -> inventoryUpdateLogRepository.save(InventoryUpdateLog.builder()
                         .productId(command.getProductId())
                         .orderNo(command.getOrderNo())
-                        .quantity(command.getQuantity())
-                        .type(StockType.INCREASE)
+                        .quantity(command.getStock())
+                        .type(command.getStockType())
                         .build()))
-                .flatMap(__ -> productRepository.findByProductId(command.getProductId()))
-                .flatMap(product -> productRepository.save(product.updateStock(command.getQuantity(), StockType.INCREASE)))
+                .flatMap(__ -> productRepository.findById(command.getProductId()))
+                .flatMap(product -> productRepository.save(product.updateStock(command.getStock(), command.getStockType())))
                 .thenReturn(true);
     }
 
