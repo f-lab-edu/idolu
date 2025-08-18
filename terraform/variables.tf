@@ -37,7 +37,7 @@ variable "my_instance_type" {
 variable "cluster_base_name" {
   description = "Cluster 이름"
   type        = string
-  default     = "idoluEKS"
+  default     = "idolu"
 }
 
 variable "kubernetes_version" {
