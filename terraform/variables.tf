@@ -70,6 +70,12 @@ variable "target_region" {
   default     = "ap-northeast-2"
 }
 
+variable "aws_profile" {
+  description = "AWS CLI 프로파일"
+  type        = string
+  default     = "my-profile"
+}
+
 variable "availability_zone" {
   description = "가용 영역 리스트"
   type        = list(string)
