@@ -40,7 +40,7 @@ public class SecurityConfig {
         authenticationWebFilter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler);
 
         httpSecurity
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(ServerHttpSecurity.CsrfSpec::disable) // test
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // session STATELESS
